@@ -789,7 +789,7 @@ function DailyLogBottom() {
       </div>
       <div className="feat-dl-jobs">
         {[
-          { color: "#6C63FF", name: "Uber",      h: "22h",   earn: "$620" },
+          { color: "#6C63FF", name: "Rideshare", h: "22h",   earn: "$620" },
           { color: "#00D4AA", name: "Server",    h: "12.5h", earn: "$310" },
           { color: "#FFB547", name: "Cash tips", h: "—",     earn: "$50"  },
         ].map((job, i) => (
@@ -1376,7 +1376,7 @@ function WalletExplainerModal({ onClose, triggerRef }) {
   const tc = slide.tierColor;
   const JOB_PRESETS = [
     { name: "Housekeeper", rate: "$20/hr", bg: "#6C63FF22", border: "#6C63FF55", text: "#A78BFA" },
-    { name: "Uber",        rate: "",       bg: "#00D4AA22", border: "#00D4AA55", text: "#00D4AA" },
+    { name: "Rideshare",   rate: "",       bg: "#00D4AA22", border: "#00D4AA55", text: "#00D4AA" },
     { name: "Tutoring",    rate: "$30/hr", bg: "#F59E0B22", border: "#F59E0B55", text: "#F59E0B" },
     { name: "Cafe shift",  rate: "$18/hr", bg: "#60A5FA22", border: "#60A5FA55", text: "#60A5FA" },
   ];

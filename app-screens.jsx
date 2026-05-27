@@ -426,7 +426,7 @@ function StatsScreen() {
 // ── Daily Log screen — Weekly Stats view (matches actual app)
 function DailyLogScreen() {
   const jobs = [
-    { dot: "#6C63FF", n: "Uber",       h: "22h",   earn: 620 },
+    { dot: "#6C63FF", n: "Rideshare",  h: "22h",   earn: 620 },
     { dot: "#00D4AA", n: "Server",     h: "12.5h", earn: 310 },
     { dot: "#FFB547", n: "Cash tips",  h: "—",     earn: 50  },
   ];
