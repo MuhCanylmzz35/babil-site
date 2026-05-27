@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-variant="classic">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Babil — Personal finance tracker</title>
+<meta name="description" content="Babil is a personal finance tracker that helps you understand spending, earnings, and habits at a glance." />
+<meta property="og:title" content="Babil — Personal finance tracker" />
+<meta property="og:description" content="Babil is a personal finance tracker that helps you understand spending, earnings, and habits at a glance." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://babilfinance.com" />
+<link rel="icon" href="assets/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Instrument+Serif&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+
+<script>
+  // Tweak defaults — editable via the Tweaks toolbar toggle.
+  window.__TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "theme": "dark",
+    "accent": "#00B488",
+    "variant": "classic"
+  }/*EDITMODE-END*/;
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<template id="__bundler_thumbnail" data-bg-color="#0D1117">
+  <svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#FFB547"/>
+        <stop offset="100%" stop-color="#FF6B35"/>
+      </linearGradient>
+    </defs>
+    <rect width="120" height="80" fill="#0D1117"/>
+    <polygon points="60,18 74,26 74,42 60,50 46,42 46,26" fill="none" stroke="url(#g)" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="53" y="38" width="3" height="8" rx="1" fill="url(#g)"/>
+    <rect x="58" y="33" width="3" height="13" rx="1" fill="url(#g)"/>
+    <rect x="63" y="27" width="3" height="19" rx="1" fill="url(#g)"/>
+    <text x="60" y="62" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="#FFB547" letter-spacing="-0.3">Babil</text>
+  </svg>
+</template>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="app-screens.jsx"></script>
+<script type="text/babel" src="landing.jsx"></script>
+<script type="text/babel" src="pages.jsx"></script>
+
+<script type="text/babel">
+const ACCENTS = {
+  "#6C63FF": { primary: "#6C63FF", muted: "#A78BFA", ghost: "#1A1535", ghostBorder: "#6C63FF55", ghostLight: "#EFEBFF" },
+  "#00B488": { primary: "#00B488", muted: "#5EE5C0", ghost: "#0E2B22", ghostBorder: "#00B48855", ghostLight: "#E6F8F2" },
+  "#FF7A2F": { primary: "#FF7A2F", muted: "#FFB088", ghost: "#2A1A11", ghostBorder: "#FF7A2F55", ghostLight: "#FFF2EA" },
+};
+
+function App() {
+  const [t] = React.useState(window.__TWEAK_DEFAULTS);
+  const [page, setPage] = React.useState("home");
+
+  // apply theme + accent on root
+  React.useEffect(() => {
+    const html = document.documentElement;
+    html.setAttribute("data-theme", t.theme);
+    html.setAttribute("data-variant", t.variant);
+    const a = ACCENTS[t.accent] || ACCENTS["#6C63FF"];
+    html.style.setProperty("--primary", a.primary);
+    html.style.setProperty("--primary-muted", a.muted);
+    html.style.setProperty("--primary-ghost", t.theme === "light" ? a.ghostLight : a.ghost);
+    html.style.setProperty("--primary-ghost-border", a.ghostBorder);
+  }, [t.theme, t.accent, t.variant]);
+
+  React.useEffect(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, [page]);
+
+  return (
+    <React.Fragment>
+      <Nav page={page} setPage={setPage} variant={t.variant} />
+      <main>
+        {page === "home" && <Landing variant={t.variant} />}
+        {page === "privacy" && <PrivacyPage />}
+        {page === "terms" && <TermsPage />}
+        {page === "support" && <SupportPage setPage={setPage} />}
+      </main>
+      <Footer setPage={setPage} />
+
+
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
