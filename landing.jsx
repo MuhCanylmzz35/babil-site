@@ -1051,8 +1051,8 @@ function InfoTooltip({ text, isOpen, onToggle }) {
   );
 }
 
-function PricingCell({ value, color }) {
-  const cellBase = { textAlign: "center", padding: "7px 8px", borderLeft: "1px solid var(--border)" };
+function PricingCell({ value, color, extraStyle }) {
+  const cellBase = { textAlign: "center", padding: "7px 8px", borderLeft: "1px solid var(--border)", ...extraStyle };
   if (value === true) {
     return (
       <td style={cellBase}>
@@ -1084,195 +1084,174 @@ function PricingCell({ value, color }) {
   );
 }
 
-// ─── Wallet diagram rendered in HTML (mirrors WalletDiagram.js logic) ────────
-function WalletDiagramWeb({ slide }) {
+// ─── Wallet diagram - 3D animated ──────────────────────────────────────────────
+function WalletDiagramWeb({ slide, tierColor, layout }) {
   if (!slide) return null;
+  const tc  = tierColor || '#A78BFA';
+  const isH = layout === 'horizontal';
+  const [vis, setVis] = React.useState(false);
+  const [animKey, setAnimKey] = React.useState(0);
+  const uid = React.useId().replace(/:/g,'');
 
-  function YouNode() {
-    return (
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 7, background: "#0F1420", border: "1px solid #252D3F", borderRadius: 12, padding: "7px 16px" }}>
-          <span style={{ fontSize: 15 }}>👤</span>
-          <span style={{ color: "#FFFFFF", fontSize: 13, fontWeight: 700, fontFamily: "Space Grotesk, sans-serif" }}>You</span>
-        </div>
-      </div>
-    );
+  React.useEffect(() => {
+    setVis(false);
+    const t = setTimeout(() => { setVis(true); setAnimKey(k => k+1); }, 60);
+    return () => clearTimeout(t);
+  }, [slide.id]);
+
+  const diagCSS = `
+    @keyframes wdYouIn  { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
+    @keyframes wdRing   { 0%{transform:translate(-50%,-50%) scale(1);opacity:0.55} 100%{transform:translate(-50%,-50%) scale(2.4);opacity:0} }
+    @keyframes wdCardIn { from{opacity:0;transform:perspective(500px) rotateX(11deg) rotateY(-3deg) translateY(16px)} to{opacity:1;transform:perspective(500px) rotateX(11deg) rotateY(-3deg) translateY(0)} }
+    @keyframes wdFloat  { 0%,100%{transform:perspective(500px) rotateX(11deg) rotateY(-3deg) translateY(0)} 50%{transform:perspective(500px) rotateX(11deg) rotateY(-3deg) translateY(-5px)} }
+    @keyframes wdItemIn { from{opacity:0;transform:translateX(-7px)} to{opacity:1;transform:translateX(0)} }
+    @keyframes wdGlow   { 0%,100%{opacity:0.3;transform:scaleX(0.75)} 50%{opacity:0.7;transform:scaleX(1.05)} }
+  `;
+
+  function ItemIconMini({ label }) {
+    const l = (label||'').toLowerCase();
+    const c = 'rgba(255,255,255,0.44)'; const sw = '1.3';
+    if (l.includes('credit')||l.includes('debit')||l.includes('card'))
+      return <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke={c} strokeWidth={sw}/><line x1="2" y1="10" x2="22" y2="10" stroke={c} strokeWidth={sw}/><rect x="5" y="13" width="4" height="2" rx="0.5" fill={c}/></svg>;
+    if (l.includes('cash'))
+      return <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="12" rx="2" stroke={c} strokeWidth={sw}/><circle cx="12" cy="12" r="3" stroke={c} strokeWidth={sw}/><circle cx="5" cy="12" r="1" fill={c}/><circle cx="19" cy="12" r="1" fill={c}/></svg>;
+    if (l.includes('saving'))
+      return <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M4 14c0-4.4 3.6-8 8-8s8 3.6 8 8v2H4v-2z" stroke={c} strokeWidth={sw} strokeLinejoin="round"/><path d="M8 18v1M16 18v1" stroke={c} strokeWidth={sw} strokeLinecap="round"/></svg>;
+    if (l.includes('transport'))
+      return <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 00-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" stroke={c} strokeWidth={sw} strokeLinejoin="round" strokeLinecap="round"/></svg>;
+    if (l.includes('lodging')||l.includes('hotel'))
+      return <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke={c} strokeWidth={sw} strokeLinejoin="round"/><rect x="9" y="14" width="6" height="8" stroke={c} strokeWidth={sw} strokeLinejoin="round"/></svg>;
+    if (l.includes('food'))
+      return <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><line x1="18" y1="8" x2="18" y2="21" stroke={c} strokeWidth={sw} strokeLinecap="round"/><path d="M15 8a3 3 0 006 0" stroke={c} strokeWidth={sw} strokeLinecap="round"/><line x1="6" y1="3" x2="6" y2="21" stroke={c} strokeWidth={sw} strokeLinecap="round"/><line x1="3" y1="3" x2="3" y2="10" stroke={c} strokeWidth={sw} strokeLinecap="round"/><line x1="9" y1="3" x2="9" y2="10" stroke={c} strokeWidth={sw} strokeLinecap="round"/><line x1="3" y1="10" x2="9" y2="10" stroke={c} strokeWidth={sw} strokeLinecap="round"/></svg>;
+    if (l.includes('gift'))
+      return <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><rect x="3" y="9" width="18" height="12" rx="1" stroke={c} strokeWidth={sw}/><rect x="3" y="6" width="18" height="3" rx="1" stroke={c} strokeWidth={sw}/><line x1="12" y1="6" x2="12" y2="21" stroke={c} strokeWidth={sw} strokeLinecap="round"/></svg>;
+    return <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="1.5" fill={c}/><circle cx="12" cy="12" r="1.5" fill={c}/><circle cx="19" cy="12" r="1.5" fill={c}/></svg>;
   }
 
-  function ConnV({ h = 16 }) {
+  function WalletCard({ wallet, isTrip, idx }) {
+    const cc = isTrip ? '#FF7A2F' : tc;
+    const items = isTrip ? wallet.categories : wallet.accounts;
+    const d = idx * 110; const fd = d + 720;
+    const n = (wallet.name||'').toLowerCase();
     return (
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <div style={{ width: 1, height: h, background: "#252D3F" }} />
-      </div>
-    );
-  }
-
-  function HorizBar({ pct = "60%" }) {
-    return (
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <div style={{ width: pct, height: 1, background: "#252D3F" }} />
-      </div>
-    );
-  }
-
-  function BranchDrops({ count, pct = "60%" }) {
-    return (
-      <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
-        <div style={{ width: pct, display: "flex" }}>
-          {Array.from({ length: count }).map((_, i) => (
-            <div key={i} style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-              <div style={{ width: 1, height: 16, background: "#252D3F" }} />
+      <div style={{ position:'relative', flex:1, minWidth:0 }}>
+        <div style={{ position:'absolute',bottom:-6,left:'12%',right:'12%',height:16,background:`radial-gradient(ellipse, ${cc}55 0%, transparent 70%)`,filter:'blur(5px)',pointerEvents:'none',animation:vis?`wdGlow 4s ease-in-out ${fd}ms infinite`:'none' }} />
+        <div style={{ background:`linear-gradient(148deg, ${cc}14 0%, ${cc}06 100%)`,border:`1px solid ${cc}55`,borderRadius:13,padding:'11px 11px 9px',position:'relative',overflow:'hidden',boxShadow:`0 14px 36px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.32), inset 0 1px 0 ${cc}35`,animation:vis?`wdCardIn 0.58s cubic-bezier(0.16,1,0.3,1) ${d}ms both, wdFloat 5s ease-in-out ${fd}ms infinite`:'none' }}>
+          <div style={{ position:'absolute',top:0,left:0,right:0,height:1,background:`linear-gradient(90deg,transparent,${cc}AA,transparent)` }} />
+          <div style={{ position:'absolute',top:0,right:0,width:28,height:28,background:`radial-gradient(circle at 100% 0%, ${cc}22 0%, transparent 70%)`,pointerEvents:'none' }} />
+          <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8 }}>
+            <div style={{ display:'flex',alignItems:'center',gap:6 }}>
+              <div style={{ width:26,height:26,borderRadius:7,background:`${cc}22`,border:`1px solid ${cc}44`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
+                {isTrip ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke={cc} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="9" r="2.5" stroke={cc} strokeWidth="1.4"/></svg>
+                : n.includes('business') ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="9" width="18" height="13" rx="1.5" stroke={cc} strokeWidth="1.5" strokeLinejoin="round"/><path d="M8 9V7a4 4 0 018 0v2" stroke={cc} strokeWidth="1.5" strokeLinecap="round"/></svg>
+                : n.includes('account') ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="8" width="20" height="13" rx="2" stroke={cc} strokeWidth="1.5" strokeLinejoin="round"/><path d="M8 8V6a4 4 0 018 0v2" stroke={cc} strokeWidth="1.5" strokeLinecap="round"/></svg>
+                : <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke={cc} strokeWidth="1.5"/><path d="M4.5 20c0-4 3.36-7 7.5-7s7.5 3 7.5 7" stroke={cc} strokeWidth="1.5" strokeLinecap="round"/></svg>}
+              </div>
+              <span style={{ color:'#E4EEF8',fontSize:13.1,fontWeight:700,fontFamily:'Space Grotesk, sans-serif',lineHeight:1.2,letterSpacing:'-0.01em' }}>{wallet.name}</span>
             </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  function WalletNode({ wallet, sc = 1 }) {
-    const r = v => Math.round(v * sc);
-    return (
-      <div style={{
-        position: "relative", display: "flex", flexDirection: "column", alignItems: "center",
-        background: "#0F1420", border: "1px solid #252D3F",
-        borderRadius: r(14), padding: `${r(10)}px ${r(12)}px ${r(8)}px`,
-        width: "100%",
-      }}>
-        <span style={{
-          position: "absolute", top: r(5), right: r(5),
-          color: "#6A7080", fontSize: r(9), fontWeight: 700,
-          background: "#161B2C", border: "1px solid #252D3F",
-          borderRadius: r(5), padding: `${r(2)}px ${r(5)}px`,
-          fontFamily: "Space Grotesk, sans-serif", lineHeight: 1.3,
-          letterSpacing: "0.04em",
-        }}>
-          {wallet.currency}
-        </span>
-        <span style={{ fontSize: r(22), marginBottom: r(4), lineHeight: 1 }}>{wallet.emoji}</span>
-        <span style={{ color: "#FFFFFF", fontSize: r(12), fontWeight: 700, textAlign: "center", fontFamily: "Space Grotesk, sans-serif", lineHeight: 1.3 }}>{wallet.name}</span>
-      </div>
-    );
-  }
-
-  function ItemList({ items, sc = 1 }) {
-    if (!items || !items.length) return null;
-    const r = v => Math.round(v * sc);
-    return (
-      <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 2 }}>
-        {items.map(it => (
-          <div key={it.label} style={{ display: "flex", alignItems: "center", gap: r(7), padding: `${r(5)}px ${r(9)}px`, borderLeft: "1px solid #252D3F" }}>
-            <span style={{ fontSize: r(12) }}>{it.emoji}</span>
-            <span style={{ color: "#8A94A6", fontSize: r(11), fontWeight: 500 }}>{it.label}</span>
+            <span style={{ color:cc,fontSize:9.4,fontWeight:800,background:`${cc}1A`,border:`1px solid ${cc}40`,borderRadius:4,padding:'2px 5px',letterSpacing:'0.05em',fontFamily:'Space Grotesk, sans-serif',flexShrink:0 }}>{wallet.currency}</span>
           </div>
-        ))}
-      </div>
-    );
-  }
-
-  function SLabel({ text }) {
-    return <div style={{ textAlign: "center", color: "#6A7080", fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "8px 0 5px" }}>{text}</div>;
-  }
-
-  function SDivider() {
-    return <div style={{ width: "100%", height: 1, background: "#1A2035", margin: "12px 0" }} />;
-  }
-
-  const mainCount = slide.mainWallets.length;
-
-  // Mode A: simple (Free — 1 main + 1 trip)
-  if (mainCount === 1) {
-    const cols = [
-      { wallet: slide.mainWallets[0], items: slide.mainWallets[0].accounts },
-      ...(slide.tripWallets[0] ? [{ wallet: slide.tripWallets[0], items: slide.tripWallets[0].categories }] : []),
-    ];
-    return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "8px 0" }}>
-        <YouNode />
-        <ConnV />
-        <HorizBar pct="60%" />
-        <BranchDrops count={2} pct="60%" />
-        <div style={{ display: "flex", gap: 12, width: "100%" }}>
-          {cols.map((col, i) => (
-            <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-              <WalletNode wallet={col.wallet} sc={1} />
-              <ItemList items={col.items} sc={1} />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // Mode B: compact (Premium — 2 main + 2 trip)
-  if (mainCount === 2) {
-    return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "8px 0" }}>
-        <YouNode />
-        <ConnV />
-        <SLabel text="MAIN WALLETS" />
-        <HorizBar pct="60%" />
-        <BranchDrops count={2} pct="60%" />
-        <div style={{ display: "flex", gap: 12, width: "100%" }}>
-          {slide.mainWallets.map(w => (
-            <div key={w.name} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-              <WalletNode wallet={w} sc={0.9} />
-              <ItemList items={w.accounts} sc={0.9} />
-            </div>
-          ))}
-        </div>
-        <SDivider />
-        <SLabel text="TRIP WALLETS" />
-        <HorizBar pct="60%" />
-        <BranchDrops count={2} pct="60%" />
-        <div style={{ display: "flex", gap: 12, width: "100%" }}>
-          {slide.tripWallets.map(w => (
-            <div key={w.name} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-              <WalletNode wallet={w} sc={0.9} />
-              <ItemList items={w.categories} sc={0.9} />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // Mode C: dense (Unlimited — 3 main + 4 trip in 2×2)
-  const tripRows = [];
-  for (let i = 0; i < slide.tripWallets.length; i += 2) tripRows.push(slide.tripWallets.slice(i, i + 2));
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "8px 0" }}>
-      <YouNode />
-      <ConnV />
-      <SLabel text="MAIN WALLETS" />
-      <div style={{ position: "relative", width: "100%", height: 20, flexShrink: 0 }}>
-        <div style={{ position: "absolute", top: 0, left: "16.67%", right: "16.67%", height: 1, background: "#252D3F" }} />
-        {[16.67, 50, 83.33].map((x, i) => (
-          <div key={i} style={{ position: "absolute", top: 0, left: `calc(${x}% - 0.5px)`, width: 1, height: 20, background: "#252D3F" }} />
-        ))}
-      </div>
-      <div style={{ display: "flex", gap: 8, width: "100%" }}>
-        {slide.mainWallets.map(w => (
-          <div key={w.name} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
-            <WalletNode wallet={w} sc={0.72} />
-            <ItemList items={w.accounts} sc={0.72} />
-          </div>
-        ))}
-      </div>
-      <SDivider />
-      <SLabel text="TRIP WALLETS" />
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%" }}>
-        {tripRows.map((row, ri) => (
-          <div key={ri} style={{ display: "flex", gap: 8 }}>
-            {row.map(w => (
-              <div key={w.name} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}>
-                <WalletNode wallet={w} sc={0.82} />
-                <ItemList items={w.categories} sc={0.82} />
+          <div style={{ display:'flex',flexDirection:'column',gap:2.5 }}>
+            {items.map((it, ii) => (
+              <div key={it.label} style={{ display:'flex',alignItems:'center',gap:6,padding:'3px 7px',borderLeft:`1.5px solid ${cc}40`,background:`${cc}06`,borderRadius:'0 4px 4px 0',opacity:vis?1:0,animation:vis?`wdItemIn 0.38s ease ${d+220+ii*58}ms both`:'none' }}>
+                <ItemIconMini label={it.label} />
+                <span style={{ color:'#6A8098',fontSize:11.3,fontWeight:500,letterSpacing:'0.01em' }}>{it.label}</span>
               </div>
             ))}
+            {!isTrip && (
+              <div style={{ display:'flex',alignItems:'center',gap:6,padding:'3px 7px',borderLeft:`1.5px dashed ${cc}28`,borderRadius:'0 4px 4px 0',opacity:vis?0.45:0,animation:vis?`wdItemIn 0.38s ease ${d+220+items.length*58}ms both`:'none' }}>
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke={cc} strokeWidth="1.8" strokeLinecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke={cc} strokeWidth="1.8" strokeLinecap="round"/></svg>
+                <span style={{ color:`${cc}80`,fontSize:10,fontWeight:600,letterSpacing:'0.04em',fontFamily:'Space Grotesk, sans-serif' }}>Add account</span>
+              </div>
+            )}
           </div>
-        ))}
+        </div>
       </div>
+    );
+  }
+
+  const ghostCounts = { free:{main:0,trip:0}, premium:{main:1,trip:2}, unlimited:{main:1,trip:2} };
+  const ghosts = ghostCounts[slide.id] || {main:0,trip:0};
+  const isUnlimited = slide.id === 'unlimited';
+
+  function GhostCard({ color, isUnlim, delay }) {
+    return (
+      <div style={{ flex:1, minWidth:0, border:`1.5px dashed ${color}45`, borderRadius:11, padding:'6px', display:'flex', alignItems:'center', justifyContent:'center', background:`${color}04`, opacity:vis?0.55:0, animation:vis?`wdCardIn 0.5s cubic-bezier(0.16,1,0.3,1) ${delay}ms both`:'none', minHeight:54 }}>
+        <div style={{ width:22,height:22,borderRadius:'50%',border:`1.5px dashed ${color}50`,display:'flex',alignItems:'center',justifyContent:'center',color:`${color}80`,fontSize:isUnlim?13:16,fontWeight:300,lineHeight:1 }}>
+          {isUnlim ? '∞' : '+'}
+        </div>
+      </div>
+    );
+  }
+
+  const allMain = slide.mainWallets;
+  const allTrip = slide.tripWallets;
+  const total   = allMain.length + allTrip.length;
+
+  return (
+    <div key={animKey} style={{ position:'relative' }}>
+      <style>{diagCSS}</style>
+      <div style={{ display:'flex',justifyContent:'center',marginBottom:14,position:'relative' }}>
+        {vis && [0,1,2].map(i => (
+          <div key={i} style={{ position:'absolute',top:'50%',left:'50%',width:46,height:46,borderRadius:'50%',border:`1.5px solid ${tc}65`,animation:`wdRing 2.8s ease-out ${i*0.9}s infinite`,pointerEvents:'none' }} />
+        ))}
+        <div style={{ display:'inline-flex',alignItems:'center',gap:8,background:`${tc}18`,border:`1.5px solid ${tc}65`,borderRadius:100,padding:'7px 16px 7px 9px',boxShadow:`0 0 22px ${tc}40, 0 0 44px ${tc}18`,animation:vis?'wdYouIn 0.5s cubic-bezier(0.16,1,0.3,1) both':'none',position:'relative',zIndex:2 }}>
+          <div style={{ width:24,height:24,borderRadius:'50%',background:`${tc}32`,border:`1px solid ${tc}60`,display:'flex',alignItems:'center',justifyContent:'center' }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke={tc} strokeWidth="1.6"/><path d="M4.5 20c0-4 3.36-7 7.5-7s7.5 3 7.5 7" stroke={tc} strokeWidth="1.6" strokeLinecap="round"/></svg>
+          </div>
+          <span style={{ color:'#fff',fontSize:15,fontWeight:700,fontFamily:'Space Grotesk, sans-serif' }}>You</span>
+        </div>
+      </div>
+      <svg width="100%" height="26" style={{ display:'block',overflow:'visible',marginBottom:0 }}>
+        <defs>
+          <linearGradient id={`${uid}v`} x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor={tc} stopOpacity="0.85"/><stop offset="100%" stopColor={tc} stopOpacity="0.08"/></linearGradient>
+          <linearGradient id={`${uid}h`} x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor={tc} stopOpacity="0.04"/><stop offset="50%" stopColor={tc} stopOpacity="0.45"/><stop offset="100%" stopColor={tc} stopOpacity="0.04"/></linearGradient>
+        </defs>
+        <line x1="50%" y1="0" x2="50%" y2="18" stroke={`url(#${uid}v)`} strokeWidth="1.5" strokeLinecap="round" strokeDasharray="20" style={{ strokeDashoffset:vis?0:20,transition:'stroke-dashoffset 0.35s 0.1s ease' }} />
+        {total > 1 && <line x1={isH?'5%':(total===2?'25%':total===3?'17%':'10%')} y1="18" x2={isH?'95%':(total===2?'75%':total===3?'83%':'90%')} y2="18" stroke={`url(#${uid}h)`} strokeWidth="1.2" strokeDasharray="400" style={{ strokeDashoffset:vis?0:400,transition:'stroke-dashoffset 0.5s 0.22s ease' }} />}
+      </svg>
+      {isH ? (
+        <div style={{ display:'flex',gap:10,alignItems:'stretch' }}>
+          {/* Main wallets group */}
+          <div style={{ display:'flex',flexDirection:'column',gap:7,flex:allMain.length+(ghosts.main||0),minWidth:0 }}>
+            <div style={{ fontSize:9.4,fontWeight:700,textTransform:'uppercase',letterSpacing:'0.13em',color:tc,fontFamily:'Space Grotesk, sans-serif',textAlign:'center',paddingBottom:4,borderBottom:`1px solid ${tc}28`,opacity:0.85 }}>
+              Main Wallets
+            </div>
+            <div style={{ display:'grid',gridTemplateColumns:(allMain.length+ghosts.main)<=2?`repeat(${allMain.length+ghosts.main},1fr)`:'1fr 1fr',gap:8 }}>
+              {allMain.map((w,i) => <WalletCard key={w.name} wallet={w} isTrip={false} idx={i} />)}
+              {Array.from({length:ghosts.main}).map((_,gi) => (
+                <GhostCard key={`mg${gi}`} color={tc} isUnlim={isUnlimited} delay={(allMain.length+gi)*110+200} />
+              ))}
+            </div>
+          </div>
+          {/* Divider */}
+          {allTrip.length > 0 && allMain.length > 0 && (
+            <div style={{ display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'stretch',flexShrink:0,padding:'0 4px',paddingTop:20 }}>
+              <div style={{ width:1,flex:1,background:`linear-gradient(180deg, ${tc}18, #FF7A2F18)` }} />
+            </div>
+          )}
+          {/* Trip wallets group */}
+          {allTrip.length > 0 && (
+            <div style={{ display:'flex',flexDirection:'column',gap:7,flex:Math.min(allTrip.length+(ghosts.trip||0),3),minWidth:0 }}>
+              <div style={{ fontSize:9.4,fontWeight:700,textTransform:'uppercase',letterSpacing:'0.13em',color:'#FF7A2F',fontFamily:'Space Grotesk, sans-serif',textAlign:'center',paddingBottom:4,borderBottom:'1px solid #FF7A2F28',opacity:0.85 }}>
+                Trip Wallets
+              </div>
+              <div style={{ display:'grid',gridTemplateColumns:(allTrip.length+ghosts.trip)<=2?`repeat(${allTrip.length+ghosts.trip},1fr)`:'1fr 1fr',gap:8 }}>
+                {allTrip.map((w,i) => <WalletCard key={w.name} wallet={w} isTrip={true} idx={allMain.length+i} />)}
+                {Array.from({length:ghosts.trip}).map((_,gi) => (
+                  <GhostCard key={`tg${gi}`} color="#FF7A2F" isUnlim={isUnlimited} delay={(allMain.length+allTrip.length+gi)*110+200} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <React.Fragment>
+          {allMain.length > 0 && <div><div style={{ fontSize:9.4,fontWeight:700,textTransform:'uppercase',letterSpacing:'0.13em',color:'#3A5570',marginBottom:7,textAlign:'center',fontFamily:'Space Grotesk, sans-serif' }}>Main Wallets</div><div style={{ display:'flex',gap:8 }}>{allMain.map((w,i) => <WalletCard key={w.name} wallet={w} isTrip={false} idx={i} />)}</div></div>}
+          {allTrip.length > 0 && allMain.length > 0 && <div style={{ margin:'12px 0 8px',display:'flex',alignItems:'center',gap:8 }}><div style={{ flex:1,height:1,background:`linear-gradient(90deg,transparent,${tc}22)` }} /><span style={{ fontSize:9.4,fontWeight:700,textTransform:'uppercase',letterSpacing:'0.13em',color:'#3A5570',fontFamily:'Space Grotesk, sans-serif',flexShrink:0 }}>Trip Wallets</span><div style={{ flex:1,height:1,background:'linear-gradient(90deg,#FF7A2F22,transparent)' }} /></div>}
+          {allTrip.length > 0 && <div style={{ display:'grid',gridTemplateColumns:allTrip.length<=2?(`repeat(${allTrip.length},1fr)`):'1fr 1fr',gap:8 }}>{allTrip.map((w,i) => <WalletCard key={w.name} wallet={w} isTrip={true} idx={allMain.length+i} />)}</div>}
+        </React.Fragment>
+      )}
     </div>
   );
 }
@@ -1282,7 +1261,7 @@ const WALLET_SLIDES = [
   {
     id: "free", tier: "Free", tierColor: "#8A94A6",
     mainWallets: [
-      { name: "Personal", currency: "USD", symbol: "$", emoji: "💼",
+      { name: "Personal Wallet", currency: "USD", symbol: "$", emoji: "💼",
         accounts: [{ emoji: "💳", label: "Credit Card" }, { emoji: "💵", label: "Cash" }, { emoji: "🏦", label: "Savings" }] },
     ],
     tripWallets: [
@@ -1293,9 +1272,9 @@ const WALLET_SLIDES = [
   {
     id: "premium", tier: "Premium", tierColor: "#F59E0B",
     mainWallets: [
-      { name: "Personal", currency: "USD", symbol: "$", emoji: "💼",
+      { name: "Personal Wallet", currency: "USD", symbol: "$", emoji: "💼",
         accounts: [{ emoji: "💳", label: "Credit Card" }, { emoji: "💵", label: "Cash" }] },
-      { name: "Business", currency: "USD", symbol: "$", emoji: "🏢",
+      { name: "Business Wallet", currency: "USD", symbol: "$", emoji: "🏢",
         accounts: [{ emoji: "💳", label: "Credit Card" }, { emoji: "💵", label: "Cash" }] },
     ],
     tripWallets: [
@@ -1308,11 +1287,11 @@ const WALLET_SLIDES = [
   {
     id: "unlimited", tier: "Unlimited", tierColor: "#A78BFA",
     mainWallets: [
-      { name: "USA Account", currency: "USD", symbol: "$", emoji: "🇺🇸",
+      { name: "USA Account Wallet", currency: "USD", symbol: "$", emoji: "🇺🇸",
         accounts: [{ emoji: "💳", label: "Credit Card" }, { emoji: "💵", label: "Cash" }] },
-      { name: "UK Account", currency: "GBP", symbol: "£", emoji: "🇬🇧",
+      { name: "UK Account Wallet", currency: "GBP", symbol: "£", emoji: "🇬🇧",
         accounts: [{ emoji: "💳", label: "Debit Card" }, { emoji: "🏦", label: "Savings" }] },
-      { name: "Business", currency: "EUR", symbol: "€", emoji: "🏢",
+      { name: "Business Wallet", currency: "EUR", symbol: "€", emoji: "🏢",
         accounts: [{ emoji: "💳", label: "Credit Card" }, { emoji: "💵", label: "Cash" }] },
     ],
     tripWallets: [
@@ -1328,244 +1307,216 @@ const WALLET_SLIDES = [
   },
 ];
 
-function WalletExplainerModal({ onClose }) {
+function WalletExplainerModal({ onClose, triggerRef }) {
   const [activeSlide, setActiveSlide] = React.useState(0);
+  const [isClosing, setIsClosing] = React.useState(false);
+  const modalBoxRef  = React.useRef(null);
+  const backdropRef  = React.useRef(null);
+
+  function handleClose() {
+    if (isClosing) return;
+    setIsClosing(true);
+
+    const box      = modalBoxRef.current;
+    const backdrop = backdropRef.current;
+
+    // Calculate vacuum target
+    let dx = 0, dy = 0;
+    if (triggerRef && triggerRef.current && box) {
+      const btn     = triggerRef.current.getBoundingClientRect();
+      const boxRect = box.getBoundingClientRect();
+      dx = (btn.left + btn.width  / 2) - (boxRect.left + boxRect.width  / 2);
+      dy = (btn.top  + btn.height / 2) - (boxRect.top  + boxRect.height / 2);
+    }
+
+    // Animate modal box with Web Animations API
+    if (box) {
+      box.animate(
+        [
+          { transform: 'translate(0,0) scale(1)',            opacity: '1' },
+          { transform: `translate(${dx}px,${dy}px) scale(0.03)`, opacity: '0' }
+        ],
+        { duration: 500, easing: 'cubic-bezier(0.55,0,1,0.45)', fill: 'forwards' }
+      );
+    }
+
+    // Fade backdrop
+    if (backdrop) {
+      backdrop.animate(
+        [
+          { background: 'rgba(0,0,0,0.88)' },
+          { background: 'rgba(0,0,0,0)' }
+        ],
+        { duration: 420, easing: 'ease', fill: 'forwards' }
+      );
+    }
+
+    // Unmount + pulse button
+    setTimeout(() => {
+      onClose();
+      if (triggerRef && triggerRef.current) {
+        const b = triggerRef.current;
+        b.style.boxShadow = '0 0 0 5px rgba(167,139,250,0.55), 0 0 0 12px rgba(167,139,250,0.15)';
+        b.style.transition = 'box-shadow 0.05s';
+        setTimeout(() => {
+          b.style.boxShadow = '0 0 0 0px rgba(167,139,250,0)';
+          b.style.transition = 'box-shadow 0.85s ease';
+          setTimeout(() => { b.style.boxShadow = ''; b.style.transition = ''; }, 950);
+        }, 100);
+      }
+    }, 500);
+  }
 
   React.useEffect(() => {
-    function onKey(e) { if (e.key === "Escape") onClose(); }
+    function onKey(e) { if (e.key === "Escape") handleClose(); }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, []);
-
+  }, [isClosing]);
   const slide = WALLET_SLIDES[activeSlide];
-
+  const tc = slide.tierColor;
   const JOB_PRESETS = [
     { name: "Housekeeper", rate: "$20/hr", bg: "#6C63FF22", border: "#6C63FF55", text: "#A78BFA" },
     { name: "Uber",        rate: "",       bg: "#00D4AA22", border: "#00D4AA55", text: "#00D4AA" },
     { name: "Tutoring",    rate: "$30/hr", bg: "#F59E0B22", border: "#F59E0B55", text: "#F59E0B" },
     { name: "Cafe shift",  rate: "$18/hr", bg: "#60A5FA22", border: "#60A5FA55", text: "#60A5FA" },
   ];
-
   const EXAMPLES = [
     { emoji: "🌍", title: "Living across countries",      desc: "A wallet per country and currency, so balances stay clean." },
-    { emoji: "🏠", title: "Sharing with roommates",       desc: "Your personal money in one wallet, shared apartment costs in another." },
+    { emoji: "🏠", title: "Sharing with roommates",       desc: "Your personal money in one wallet, shared costs in another." },
     { emoji: "💼", title: "Business owner or freelancer", desc: "Keep personal and business books separate for easier tax time." },
   ];
-
   return ReactDOM.createPortal(
-    <div
-      onClick={onClose}
-      style={{
-        position: "fixed", inset: 0, zIndex: 9999,
-        background: "rgba(0,0,0,0.75)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        padding: "24px",
-        animation: "modalOverlayIn 0.2s ease forwards",
-      }}
-    >
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{
-          background: "#0D1117",
-          border: "1px solid #1E2640",
-          borderRadius: 24,
-          width: "min(75vw, 820px)",
-          height: "75vh",
-          display: "flex", flexDirection: "column",
-          animation: "modalIn 0.22s cubic-bezier(0.2,0.7,0.2,1) forwards",
-          overflow: "hidden",
-        }}
-      >
-        {/* ── Header ── */}
-        <div style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "20px 28px 16px", borderBottom: "1px solid #1E2640", flexShrink: 0,
-        }}>
-          <h3 style={{ color: "#FFFFFF", fontSize: 18, fontWeight: 700, margin: 0, fontFamily: "Space Grotesk, sans-serif" }}>
-            How Babil organizes your money
-          </h3>
-          <button
-            onClick={onClose}
-            style={{
-              width: 32, height: 32, borderRadius: "50%",
-              background: "#1C1C1E", border: "1px solid #2C2C2E",
-              color: "#FFFFFF", cursor: "pointer",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              flexShrink: 0, transition: "background 0.15s",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#2C2C2E"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "#1C1C1E"; }}
-            aria-label="Close"
-          >
-            <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-              <path d="M1 1l9 9M10 1L1 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-            </svg>
+    <div ref={backdropRef} onClick={handleClose} style={{ position:"fixed",inset:0,zIndex:9999,background:"rgba(0,0,0,0.88)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",padding:"20px",animation:"modalOverlayIn 0.25s ease forwards" }}>
+      <div ref={modalBoxRef} onClick={e => e.stopPropagation()} style={{ display:"flex",flexDirection:"column",background:"#06090F",border:"1px solid #0F1825",borderRadius:28,width:"min(96vw, 1040px)",maxHeight:"88vh",overflow:"hidden",animation:"modalIn 0.38s cubic-bezier(0.16,1,0.3,1) forwards",boxShadow:"0 40px 120px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.05)",willChange:"transform,opacity" }}>
+
+        <style>{`.babil-ms::-webkit-scrollbar{width:4px}.babil-ms::-webkit-scrollbar-track{background:transparent}.babil-ms::-webkit-scrollbar-thumb{background:#1A2840;border-radius:6px}.babil-ms::-webkit-scrollbar-thumb:hover{background:#263A58}`}</style>
+
+        {/* TOP BAR */}
+        <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",padding:"16px 24px 14px",borderBottom:"1px solid #0C1526",flexShrink:0 }}>
+          <div>
+            <div style={{ color:"#4A6A8A",fontSize:11.3,fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:4,fontFamily:"Space Grotesk, sans-serif" }}>Babil · Money structure</div>
+            <h3 style={{ color:"#FFFFFF",fontSize:21.3,fontWeight:800,margin:0,fontFamily:"Space Grotesk, sans-serif",lineHeight:1.15,letterSpacing:"-0.025em" }}>How Babil organizes your money</h3>
+          </div>
+          <button onClick={handleClose} style={{ width:32,height:32,borderRadius:"50%",background:"#0A1020",border:"1px solid #0F1C2E",color:"#607080",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.15s" }} onMouseEnter={e=>{e.currentTarget.style.background="#111D2E";e.currentTarget.style.color="#fff";}} onMouseLeave={e=>{e.currentTarget.style.background="#0A1020";e.currentTarget.style.color="#607080";}}>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
           </button>
         </div>
 
-        {/* ── Single scrollable column ── */}
-        <div style={{ overflowY: "auto", flex: 1 }}>
+        {/* TIER TABS */}
+        <div style={{ display:"flex",borderBottom:"1px solid #0C1526",flexShrink:0,background:"#050810" }}>
+          {WALLET_SLIDES.map((s, i) => {
+            const active = i === activeSlide;
+            return (
+              <button key={s.id} onClick={() => setActiveSlide(i)}
+                style={{ flex:1,padding:"13px 20px",background:active?s.tierColor+"14":"transparent",border:"none",borderBottom:active?`2.5px solid ${s.tierColor}`:"2.5px solid transparent",borderRight:i<2?"1px solid #0C1526":"none",cursor:"pointer",transition:"all 0.2s ease",display:"flex",flexDirection:"column",alignItems:"center",gap:3 }}
+                onMouseEnter={e=>{ if(!active) e.currentTarget.style.background=s.tierColor+"08"; }}
+                onMouseLeave={e=>{ if(!active) e.currentTarget.style.background="transparent"; }}
+              >
+                <div style={{ display:"flex",alignItems:"center",gap:7 }}>
+                  <div style={{ width:7,height:7,borderRadius:"50%",background:s.tierColor,boxShadow:active?`0 0 8px ${s.tierColor}CC`:"none",transition:"box-shadow 0.2s" }} />
+                  <span style={{ color:active?s.tierColor:"#4A6A8A",fontSize:17.5,fontWeight:700,fontFamily:"Space Grotesk, sans-serif",letterSpacing:"0.02em",transition:"color 0.2s" }}>{s.tier}</span>
+                </div>
+                <span style={{ color:active?s.tierColor+"BB":"#2E4060",fontSize:12.5,fontWeight:500,transition:"color 0.2s" }}>
+                  {s.id === "free" ? "1 main wallet · 1 trip wallet" : s.id === "premium" ? "3 main wallets · 4 trip wallets" : "∞ main wallets · ∞ trip wallets"}
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
-          {/* ── Diagram section ── */}
-          <div style={{ padding: "24px 32px 20px" }}>
-            {/* Plan tabs */}
-            <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-              {WALLET_SLIDES.map((s, i) => (
-                <button
-                  key={s.id}
-                  onClick={() => setActiveSlide(i)}
-                  style={{
-                    flex: 1, padding: "9px 0", borderRadius: 100,
-                    fontFamily: "Space Grotesk, sans-serif",
-                    fontSize: 12, fontWeight: 700,
-                    textTransform: "uppercase", letterSpacing: "0.07em",
-                    cursor: "pointer", transition: "all 0.18s",
-                    background: i === activeSlide ? s.tierColor + "20" : "transparent",
-                    color: i === activeSlide ? s.tierColor : "#6A7080",
-                    border: i === activeSlide ? `1px solid ${s.tierColor}55` : "1px solid #252D3F",
-                  }}
-                >
-                  {s.tier}
-                </button>
-              ))}
-            </div>
+        {/* SCROLLABLE CONTENT — diagram + explanations together */}
+        <div className="babil-ms" style={{ overflowY:"auto",flex:1,display:"flex",flexDirection:"column",scrollbarWidth:"thin",scrollbarColor:"#1A2840 transparent" }}>
 
-            {/* Diagram */}
-            <WalletDiagramWeb slide={slide} />
-
-            {/* Dot indicators */}
-            <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 18 }}>
-              {WALLET_SLIDES.map((s, i) => (
-                <div
-                  key={s.id}
-                  onClick={() => setActiveSlide(i)}
-                  style={{
-                    width: i === activeSlide ? 26 : 8, height: 8,
-                    borderRadius: 5,
-                    background: i === activeSlide ? s.tierColor : "#252D3F",
-                    cursor: "pointer", transition: "all 0.22s",
-                  }}
-                />
-              ))}
-            </div>
+          {/* DIAGRAM */}
+          <div style={{ padding:"20px 28px 18px",background:"linear-gradient(168deg, #070E1C 0%, #040810 100%)",borderBottom:"1px solid #0C1526",flexShrink:0,position:"relative",overflow:"hidden" }}>
+            <div style={{ position:"absolute",inset:0,pointerEvents:"none",backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E")`,mixBlendMode:"screen" }} />
+            <div style={{ position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:500,height:200,borderRadius:"50%",background:`radial-gradient(ellipse, ${tc}10 0%, transparent 70%)`,pointerEvents:"none",transition:"background 0.5s" }} />
+            <WalletDiagramWeb slide={slide} tierColor={tc} layout="horizontal" />
           </div>
 
-          {/* ── Divider ── */}
-          <div style={{ height: 1, background: "#1E2640", margin: "4px 0" }} />
+          {/* CONTENT */}
+          <div style={{ padding:"20px 28px 28px",display:"flex",flexDirection:"column",gap:18 }}>
+          <p style={{ color:"#8A9CB4",fontSize:16.3,lineHeight:"21px",margin:0 }}>
+            <strong style={{ color:"#D0DCEC" }}>A wallet</strong> is a segment of your life you want to track separately, not just a bank account. Organize finances by context: personal, business, or a trip.
+          </p>
 
-          {/* ── Detail content ── */}
-          <div style={{ padding: "28px 32px 36px", display: "flex", flexDirection: "column", gap: 28 }}>
-
-            {/* Summary */}
-            <div style={{ textAlign: "center" }}>
-              <p style={{ color: "#C4C9D4", fontSize: 15, lineHeight: "23px", margin: "0 0 6px" }}>
-                <strong style={{ color: "#FFFFFF" }}>A wallet</strong> is a part of your life you want to track separately.
-              </p>
-              <p style={{ color: "#8A94A6", fontSize: 14, lineHeight: "21px", margin: 0 }}>
-                Each plan unlocks more wallets. Switch between plans above to compare.
-              </p>
-            </div>
-
-            {/* Main vs Trip */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              {[
-                {
-                  icon: (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                      <path d="M21 18H3a1 1 0 01-1-1V7a1 1 0 011-1h4l2-2h6l2 2h4a1 1 0 011 1v10a1 1 0 01-1 1z" stroke="#A78BFA" strokeWidth="1.5" strokeLinejoin="round"/>
-                      <circle cx="12" cy="13" r="3" stroke="#A78BFA" strokeWidth="1.5"/>
-                    </svg>
-                  ),
-                  title: "Main wallet",
-                  desc: "Ongoing tracking for everyday finances. Holds your ",
-                  emph: "accounts",
-                  rest: " like cards, cash, and savings.",
-                },
-                {
-                  icon: (
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                      <path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" stroke="#A78BFA" strokeWidth="1.4" strokeLinejoin="round" strokeLinecap="round"/>
-                    </svg>
-                  ),
-                  title: "Trip wallet",
-                  desc: "Bounded in time. Spending split into ",
-                  emph: "categories",
-                  rest: " and stays separate from monthly stats.",
-                },
-              ].map((card, i) => (
-                <div key={i} style={{ background: "#0F1420", border: "1px solid #1E2640", borderRadius: 14, padding: "18px 20px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                    <div style={{ width: 34, height: 34, borderRadius: 10, background: "#A78BFA18", border: "1px solid #A78BFA30", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      {card.icon}
-                    </div>
-                    <span style={{ color: "#FFFFFF", fontSize: 14, fontWeight: 700, fontFamily: "Space Grotesk, sans-serif" }}>{card.title}</span>
-                  </div>
-                  <p style={{ color: "#8A94A6", fontSize: 13, lineHeight: "19px", margin: 0 }}>
-                    {card.desc}<strong style={{ color: "#C4C9D4" }}>{card.emph}</strong>{card.rest}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* Examples */}
-            <div>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#6A7080", marginBottom: 12 }}>
-                When you might want more than one
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-                {EXAMPLES.map((ex, i) => (
-                  <div key={i} style={{ display: "flex", flexDirection: "column", gap: 10, background: "#0F1420", border: "1px solid #1E2640", borderRadius: 14, padding: "16px" }}>
-                    <div style={{ width: 38, height: 38, borderRadius: 10, background: "#1E2640", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
-                      {ex.emoji}
-                    </div>
-                    <div>
-                      <div style={{ color: "#FFFFFF", fontSize: 13, fontWeight: 700, marginBottom: 4 }}>{ex.title}</div>
-                      <div style={{ color: "#8A94A6", fontSize: 12, lineHeight: "17px" }}>{ex.desc}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Job preset library */}
-            <div>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#6A7080", marginBottom: 12 }}>
-                Job preset library
-              </div>
-              <div style={{ background: "#0F1420", border: "1px solid #1E2640", borderRadius: 14, padding: "18px 20px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 10, background: "#A78BFA18", border: "1px solid #A78BFA30", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="9" stroke="#A78BFA" strokeWidth="1.5"/>
-                      <path d="M12 7v5l3 2" stroke="#A78BFA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
-                  <span style={{ color: "#FFFFFF", fontSize: 14, fontWeight: 700, fontFamily: "Space Grotesk, sans-serif" }}>Log work in one tap</span>
-                </div>
-                <p style={{ color: "#8A94A6", fontSize: 13, lineHeight: "19px", margin: "0 0 16px" }}>
-                  Save your recurring jobs once with an hourly rate. Tap a preset to log hours — earnings calculate automatically.
-                </p>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {JOB_PRESETS.map((job, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 9, background: job.bg, border: `1.5px solid ${job.border}`, borderRadius: 22, padding: "9px 16px" }}>
-                      <div style={{ width: 7, height: 7, borderRadius: "50%", background: job.text, flexShrink: 0 }}></div>
-                      <div>
-                        <div style={{ color: "#FFFFFF", fontSize: 13, fontWeight: 700, fontFamily: "Space Grotesk, sans-serif" }}>{job.name}</div>
-                        {job.rate && <div style={{ color: job.text, fontSize: 11, fontWeight: 600, marginTop: 1 }}>{job.rate}</div>}
+          {/* Two wallet types + Common use cases side by side */}
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,alignItems:"stretch" }}>
+            <div style={{ gridColumn:"span 2", display:"flex", flexDirection:"column", gap:12 }}>
+              <div>
+                <div style={{ fontSize:11.3,fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"#4A6A8A",marginBottom:9,fontFamily:"Space Grotesk, sans-serif" }}>Two wallet types</div>
+                <div style={{ display:"flex",flexDirection:"column",gap:7 }}>
+                  {[
+                    { color:tc, title:"Main wallet", sub:"Ongoing · holds accounts", desc:"Tracks everyday finances across cards, cash, and savings. Always running.", icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.6"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/><circle cx="12" cy="14" r="2" stroke="currentColor" strokeWidth="1.5"/></svg> },
+                    { color:"#FF7A2F", title:"Trip wallet", sub:"Bounded · holds categories", desc:"A fixed-duration wallet for travel or events. Spending isolated from monthly stats.", icon:<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="9" r="2.5" stroke="currentColor" strokeWidth="1.5"/></svg> },
+                  ].map((card,idx) => (
+                    <div key={idx} style={{ display:"flex",gap:12,padding:"11px 13px",background:`${card.color}07`,border:`1px solid ${card.color}24`,borderRadius:12,alignItems:"flex-start" }}>
+                      <div style={{ width:28,height:28,borderRadius:8,background:`${card.color}18`,border:`1px solid ${card.color}35`,display:"flex",alignItems:"center",justifyContent:"center",color:card.color,flexShrink:0 }}>{card.icon}</div>
+                      <div style={{ flex:1 }}>
+                        <div style={{ display:"flex",alignItems:"center",gap:7,marginBottom:3,flexWrap:"wrap" }}>
+                          <span style={{ color:"#E0E8F0",fontSize:15,fontWeight:700,fontFamily:"Space Grotesk, sans-serif" }}>{card.title}</span>
+                          <span style={{ color:card.color,fontSize:11.3,fontWeight:600,opacity:0.85 }}>{card.sub}</span>
+                        </div>
+                        <p style={{ color:"#7A8EA8",fontSize:13.8,lineHeight:"17px",margin:0 }}>{card.desc}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
+              {/* Work Log presets - same width as Two wallet types */}
+              <div>
+                <div style={{ fontSize:11.3,fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"#4A6A8A",marginBottom:9,fontFamily:"Space Grotesk, sans-serif" }}>Work Log presets</div>
+                <div style={{ background:"#050A12",border:"1px solid #0C1526",borderRadius:12,padding:"12px 16px" }}>
+                  <div style={{ display:"flex",alignItems:"flex-start",gap:9,marginBottom:12 }}>
+                    <div style={{ width:26,height:26,borderRadius:7,background:"#A78BFA14",border:"1px solid #A78BFA2A",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0 }}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#A78BFA" strokeWidth="1.5"/><path d="M12 7v5l3 2" stroke="#A78BFA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </div>
+                    <div>
+                      <div style={{ color:"#C8D0DE",fontSize:13.8,fontWeight:700,fontFamily:"Space Grotesk, sans-serif",marginBottom:2 }}>Log work in one tap</div>
+                      <p style={{ color:"#607080",fontSize:12.5,lineHeight:"15px",margin:0 }}>Save recurring jobs with a rate. Tap to log, earnings calculate automatically.</p>
+                    </div>
+                  </div>
+                  <div style={{ display:"flex",gap:6,flexWrap:"wrap" }}>
+                    {JOB_PRESETS.map((job,i) => (
+                      <div key={i} style={{ display:"flex",alignItems:"center",gap:5,background:job.bg,border:`1.5px solid ${job.border}`,borderRadius:16,padding:"6px 11px" }}>
+                        <div style={{ width:5,height:5,borderRadius:"50%",background:job.text,flexShrink:0 }} />
+                        <div>
+                          <div style={{ color:"#C8D0DE",fontSize:13.1,fontWeight:700,fontFamily:"Space Grotesk, sans-serif" }}>{job.name}</div>
+                          {job.rate && <div style={{ color:job.text,fontSize:11.3,fontWeight:600 }}>{job.rate}</div>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
-
+            <div style={{ display:"flex", flexDirection:"column" }}>
+              <div style={{ fontSize:11.3,fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"#4A6A8A",marginBottom:9,fontFamily:"Space Grotesk, sans-serif" }}>Common use cases</div>
+              <div style={{ display:"flex",flexDirection:"column",gap:8,flex:1 }}>
+                {EXAMPLES.map((ex,i) => (
+                  <div key={i} style={{ display:"flex",alignItems:"flex-start",gap:12,padding:"13px 14px",background:"#050A12",border:"1px solid #0C1526",borderRadius:12,flex:1 }}>
+                    <div style={{ width:34,height:34,borderRadius:9,background:"#080F1E",border:"1px solid #0F1C2E",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0 }}>{ex.emoji}</div>
+                    <div>
+                      <div style={{ color:"#B8C8D8",fontSize:15,fontWeight:700,marginBottom:4,fontFamily:"Space Grotesk, sans-serif" }}>{ex.title}</div>
+                      <div style={{ color:"#607080",fontSize:13,lineHeight:"18px" }}>{ex.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+
+          </div>{/* /CONTENT */}
+
+        </div>{/* /SCROLLABLE */}
+
       </div>
     </div>,
     document.body
   );
 }
+
+Object.assign(window, { Nav, Landing, Footer });
 
 function Pricing({ variant }) {
   const [yearly, setYearly] = React.useState(true);
@@ -1573,6 +1524,7 @@ function Pricing({ variant }) {
   const [showWalletModal, setShowWalletModal] = React.useState(false);
   const sectionRef = React.useRef(null);
   const modalShownRef = React.useRef(false);
+  const triggerBtnRef = React.useRef(null);
 
   // Auto-open once the pricing section first enters the viewport
   React.useEffect(() => {
@@ -1582,14 +1534,7 @@ function Pricing({ variant }) {
       ([entry]) => {
         if (entry.isIntersecting && !modalShownRef.current) {
           modalShownRef.current = true;
-          try {
-            if (!localStorage.getItem("babil_wallet_modal_seen")) {
-              localStorage.setItem("babil_wallet_modal_seen", "1");
-              setShowWalletModal(true);
-            }
-          } catch (_) {
-            setShowWalletModal(true);
-          }
+          setShowWalletModal(true);
         }
       },
       { threshold: 0.15 }
@@ -1681,8 +1626,34 @@ function Pricing({ variant }) {
                         verticalAlign: "bottom", position: "relative",
                         background: p.featured ? "linear-gradient(180deg, " + p.color + "0e 0%, transparent 100%)" : "transparent",
                         borderLeft: "1px solid var(--border)",
+                        ...(p.id === "unlimited" ? {
+                          borderLeft: "2px solid #00B488",
+                          borderRight: "2px solid #00B488",
+                          borderTop: "2px solid #00B488",
+                          borderBottom: "none",
+                          background: "rgba(0,180,136,0.025)",
+                        } : {}),
+                        overflow: "hidden",
                       }}
                     >
+                      {p.id === "unlimited" && (() => {
+                          const label = "Save up to 44%";
+                          return (
+                            <div style={{
+                              position: "absolute", top: 14, right: -26,
+                              background: "linear-gradient(135deg, #009E79, #00B488)",
+                              color: "#fff",
+                              fontSize: 9, fontWeight: 800,
+                              letterSpacing: "0.07em",
+                              textTransform: "uppercase",
+                              padding: "4px 32px",
+                              transform: "rotate(35deg)",
+                              boxShadow: "0 2px 10px rgba(0,180,136,0.5)",
+                              pointerEvents: "none",
+                              whiteSpace: "nowrap",
+                            }}>{label}</div>
+                          );
+                        })()}
                       <div style={{
                         fontSize: 9, fontWeight: 800, letterSpacing: "0.12em",
                         textTransform: "uppercase", color: p.color, marginBottom: 6,
@@ -1733,46 +1704,67 @@ function Pricing({ variant }) {
                   </td>
                   <PricingCell value={row.free}      color="#8A94A6" />
                   <PricingCell value={row.premium}   color="#FF7A35" />
-                  <PricingCell value={row.unlimited} color="#6C63FF" />
+                  <PricingCell value={row.unlimited} color="#6C63FF" extraStyle={{ borderLeft:"2px solid #00B488", borderRight:"2px solid #00B488", borderTop:"none", borderBottom:"none", background:"rgba(0,180,136,0.025)" }} />
                 </tr>
               ))}
+              {/* Green bottom border for Unlimited column */}
+              <tr>
+                <td style={{ padding:0, height:0 }}></td>
+                <td style={{ padding:0, height:0, borderLeft:"1px solid var(--border)" }}></td>
+                <td style={{ padding:0, height:0, borderLeft:"1px solid var(--border)" }}></td>
+                <td style={{ padding:0, height:0, borderLeft:"2px solid #00B488", borderRight:"2px solid #00B488", borderBottom:"2px solid #00B488", background:"rgba(0,180,136,0.025)" }}></td>
+              </tr>
             </tbody>
           </table>
         </div>
 
         {/* How it works CTA */}
-        <div style={{ textAlign: "center", marginTop: 32, marginBottom: 4 }}>
+        <div style={{ textAlign: "center", marginTop: 36, marginBottom: 4 }}>
           <button
+            ref={triggerBtnRef}
             onClick={() => setShowWalletModal(true)}
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 10,
-              padding: "14px 28px",
-              background: "transparent",
-              border: "1.5px solid var(--border)",
-              borderRadius: 100,
-              cursor: "pointer",
-              transition: "all 0.2s",
-              color: "var(--text-secondary)",
-              fontFamily: "Space Grotesk, sans-serif",
-              fontSize: 15, fontWeight: 600,
-            }}
             onMouseEnter={e => {
               e.currentTarget.style.borderColor = "var(--primary-muted)";
               e.currentTarget.style.color = "#FFFFFF";
-              e.currentTarget.style.background = "rgba(108,99,255,0.08)";
+              e.currentTarget.style.background = "var(--primary-ghost)";
+              const arrow = e.currentTarget.querySelector("[data-arrow]");
+              if (arrow) arrow.style.transform = "scale(1.12)";
             }}
             onMouseLeave={e => {
               e.currentTarget.style.borderColor = "var(--border)";
               e.currentTarget.style.color = "var(--text-secondary)";
               e.currentTarget.style.background = "transparent";
+              const arrow = e.currentTarget.querySelector("[data-arrow]");
+              if (arrow) arrow.style.transform = "scale(1)";
+            }}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 12,
+              padding: "9px 9px 9px 22px",
+              background: "transparent",
+              border: "1.5px solid var(--border)",
+              borderRadius: 100, cursor: "pointer",
+              transition: "border-color 0.22s, background 0.22s, color 0.22s",
+              color: "var(--text-secondary)",
+              fontFamily: "Space Grotesk, sans-serif",
+              fontSize: 14, fontWeight: 600, letterSpacing: "-0.01em",
             }}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.6"/>
-              <path d="M12 11v5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
-              <circle cx="12" cy="7.5" r="1" fill="currentColor"/>
-            </svg>
             Understand how Babil organizes your money
+            <div
+              data-arrow=""
+              style={{
+                width: 36, height: 36, borderRadius: "50%",
+                background: "var(--card-bg, #161B2C)",
+                border: "1px solid var(--border)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "transform 0.28s cubic-bezier(0.16,1,0.3,1)",
+                flexShrink: 0,
+              }}
+            >
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                <path d="M2.5 10.5L10.5 2.5M5 2.5h5.5v5.5" stroke="var(--primary)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
           </button>
         </div>
 
@@ -1781,7 +1773,7 @@ function Pricing({ variant }) {
         </p>
       </div>
 
-      {showWalletModal && <WalletExplainerModal onClose={() => setShowWalletModal(false)} />}
+      {showWalletModal && <WalletExplainerModal onClose={() => setShowWalletModal(false)} triggerRef={triggerBtnRef} />}
     </section>
   );
 }
