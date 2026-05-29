@@ -1,4 +1,4 @@
-# Babil - Website
+# Babil Website
 
 The marketing and legal website for [Babil](https://babilfinance.com), a personal finance tracker that helps you understand your spending, earnings, and habits at a glance.
 
