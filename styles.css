@@ -826,6 +826,11 @@ footer { padding: 64px 0 32px; border-top: 1px solid var(--border-ghost); margin
   .chip-val { font-size: 13px; }
   .feat-block-text { padding: 20px 16px; }
   .feat-dl-bottom { padding: 14px 16px 18px; }
+  /* Work Log: sağdaki "Earned" kutusu daraltılıp gaplar azaltıldı — toplam overflow engellendi */
+  .feat-dl-week { gap: 3px; }
+  .feat-dl-total { flex: 0 0 76px; }
+  .feat-dl-total-val { font-size: 18px; }
+  .feat-dl-total-sub { font-size: 10px; }
   .hiw-step { gap: 10px; }
   .hiw-desc { font-size: 13px; }
 }
@@ -867,12 +872,12 @@ footer { padding: 64px 0 32px; border-top: 1px solid var(--border-ghost); margin
   /* Footer */
   .footer-grid { grid-template-columns: 1fr !important; gap: 28px; }
   .footer-bot { flex-direction: column; gap: 10px; text-align: center; align-items: center; }
-  /* Work Log earn text — bar yüksekliği için üstte alan aç */
-  .feat-dl-week { padding-top: 72px; }
   /* Wallet modal grid → tek kolon */
   .wallet-modal-grid { grid-template-columns: 1fr !important; }
   .wallet-modal-left { grid-column: span 1 !important; }
   .wallet-tier-sub { display: none !important; }
+  /* Wallet modal diagram → dar padding, dikey layout için alan */
+  .wallet-diag-section { padding: 14px 10px 12px !important; }
   /* Feature block bottom 2-kolon → mobilde dikey sırala */
   .feat-block-bottom { grid-template-columns: 1fr !important; }
   .feat-block-bottom > div:first-child { border-right: none; border-bottom: 1px solid var(--border); }

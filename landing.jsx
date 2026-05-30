@@ -1428,10 +1428,10 @@ function WalletExplainerModal({ onClose, triggerRef }) {
         <div className="babil-ms" style={{ overflowY:"auto",flex:1,display:"flex",flexDirection:"column",scrollbarWidth:"thin",scrollbarColor:"#1A2840 transparent" }}>
 
           {/* DIAGRAM */}
-          <div style={{ padding:"20px 28px 18px",background:"linear-gradient(168deg, #070E1C 0%, #040810 100%)",borderBottom:"1px solid #0C1526",flexShrink:0,position:"relative",overflow:"hidden" }}>
+          <div className="wallet-diag-section" style={{ padding:"20px 28px 18px",background:"linear-gradient(168deg, #070E1C 0%, #040810 100%)",borderBottom:"1px solid #0C1526",flexShrink:0,position:"relative",overflow:"hidden" }}>
             <div style={{ position:"absolute",inset:0,pointerEvents:"none",backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E")`,mixBlendMode:"screen" }} />
             <div style={{ position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:500,height:200,borderRadius:"50%",background:`radial-gradient(ellipse, ${tc}10 0%, transparent 70%)`,pointerEvents:"none",transition:"background 0.5s" }} />
-            <WalletDiagramWeb slide={slide} tierColor={tc} layout="horizontal" />
+            <WalletDiagramWeb slide={slide} tierColor={tc} layout={typeof window !== 'undefined' && window.innerWidth < 600 ? "vertical" : "horizontal"} />
           </div>
 
           {/* CONTENT */}
