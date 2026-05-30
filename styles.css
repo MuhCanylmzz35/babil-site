@@ -807,6 +807,29 @@ footer { padding: 64px 0 32px; border-top: 1px solid var(--border-ghost); margin
   .pricing-table-outer table { min-width: 480px; }
 }
 
+@media (max-width: 479px) {
+  .pricing-table-outer table { min-width: 360px; }
+  .pricing-table-outer th:first-child,
+  .pricing-table-outer td:first-child {
+    white-space: normal;
+    word-break: break-word;
+    min-width: 90px;
+    max-width: 110px;
+  }
+  .pricing-table-outer th,
+  .pricing-table-outer td { padding-left: 6px !important; padding-right: 6px !important; }
+}
+
+@media (max-width: 480px) {
+  #pricing .section-title { font-size: clamp(22px, 6vw, 32px); }
+  .chip-lbl { font-size: 11px; }
+  .chip-val { font-size: 13px; }
+  .feat-block-text { padding: 20px 16px; }
+  .feat-dl-bottom { padding: 14px 16px 18px; }
+  .hiw-step { gap: 10px; }
+  .hiw-desc { font-size: 13px; }
+}
+
 @media (max-width: 560px) {
   .container { padding: 0 18px; }
   /* Nav */
@@ -844,6 +867,11 @@ footer { padding: 64px 0 32px; border-top: 1px solid var(--border-ghost); margin
   /* Footer */
   .footer-grid { grid-template-columns: 1fr !important; gap: 28px; }
   .footer-bot { flex-direction: column; gap: 10px; text-align: center; align-items: center; }
+  /* Feature block bottom 2-kolon → mobilde dikey sırala */
+  .feat-block-bottom { grid-template-columns: 1fr !important; }
+  .feat-block-bottom > div:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+  /* Recent activity iç grid → tek kolon */
+  .feat-recent-grid { grid-template-columns: 1fr !important; }
   /* Doc pages */
   .doc-page { padding: 48px 0; }
   .doc-page h1 { font-size: 30px; }

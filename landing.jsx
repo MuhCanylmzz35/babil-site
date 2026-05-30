@@ -316,7 +316,7 @@ function Features({ variant }) {
             </div>
           </div>
           {/* ── Bottom: Credit health + Trip wallets ── */}
-          <div style={{ borderTop: "1px solid var(--border)", background: "var(--bg)", display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 220 }}>
+          <div className="feat-block-bottom" style={{ borderTop: "1px solid var(--border)", background: "var(--bg)", display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 220 }}>
             {/* Left: Credit Utilization */}
             <div style={{ padding: "28px 36px 32px", borderRight: "1px solid var(--border)" }}>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-secondary)", marginBottom: 18 }}>Credit Utilization</div>
@@ -470,12 +470,12 @@ function Features({ variant }) {
           </div>
 
           {/* ── Bottom: Activity list + Installment visual ── */}
-          <div style={{ borderTop: "1px solid var(--border)", background: "var(--bg)", display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 220 }}>
+          <div className="feat-block-bottom" style={{ borderTop: "1px solid var(--border)", background: "var(--bg)", display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 220 }}>
 
             {/* Left: Recent category activity */}
             <div style={{ padding: "28px 36px 32px", borderRight: "1px solid var(--border)" }}>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-secondary)", marginBottom: 18 }}>Recent Activity</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
+              <div className="feat-recent-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
                 {[
                   { em: "🏠", cat: "Rent",       date: "May 1",  amt: "−$780",  neg: true  },
                   { em: "🛍️", cat: "Shopping",   date: "May 3",  amt: "−$124",  neg: true  },
@@ -613,7 +613,7 @@ function Features({ variant }) {
           </div>
 
           {/* ── Bottom: Category breakdown + Multi-trip comparison ── */}
-          <div style={{ borderTop: "1px solid var(--border)", background: "var(--bg)", display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 220 }}>
+          <div className="feat-block-bottom" style={{ borderTop: "1px solid var(--border)", background: "var(--bg)", display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 220 }}>
 
             {/* Left: Las Vegas Category Breakdown */}
             <div style={{ padding: "28px 36px 32px", borderRight: "1px solid var(--border)" }}>
@@ -1599,7 +1599,7 @@ function Pricing({ variant }) {
             <thead>
               <tr style={{ borderBottom: "1px solid var(--border)" }}>
                 {/* Label column — shrinks to fit longest text */}
-                <th style={{ width: "1px", padding: 0, textAlign: "left", whiteSpace: "nowrap" }}>
+                <th className="pricing-label-th" style={{ width: "1px", padding: 0, textAlign: "left" }}>
                   <div style={{
                     display: "flex", flexDirection: "column", justifyContent: "flex-end", gap: 8,
                     height: "100%", padding: "16px 20px 16px 16px", boxSizing: "border-box",
@@ -1690,7 +1690,7 @@ function Pricing({ variant }) {
                     background: i % 2 === 1 ? "rgba(255,255,255,0.012)" : "transparent",
                   }}
                 >
-                  <td style={{ padding: "7px 20px", fontSize: 12, fontWeight: 500, color: "var(--text)", whiteSpace: "nowrap" }}>
+                  <td className="pricing-label-td" style={{ padding: "7px 20px", fontSize: 12, fontWeight: 500, color: "var(--text)" }}>
                     <span style={{ display: "inline-flex", alignItems: "center" }}>
                       {row.label}
                       {row.tooltip && (
