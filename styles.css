@@ -826,11 +826,12 @@ footer { padding: 64px 0 32px; border-top: 1px solid var(--border-ghost); margin
   .chip-val { font-size: 13px; }
   .feat-block-text { padding: 20px 16px; }
   .feat-dl-bottom { padding: 14px 16px 18px; }
-  /* Work Log: sağdaki "Earned" kutusu daraltılıp gaplar azaltıldı — toplam overflow engellendi */
+  /* Work Log: earn min-width sıfırlandı + Earned kutusu daraltıldı — overflow engellendi */
+  .feat-dl-earn { min-width: 0; font-size: 10px; }
   .feat-dl-week { gap: 3px; }
-  .feat-dl-total { flex: 0 0 76px; }
-  .feat-dl-total-val { font-size: 18px; }
-  .feat-dl-total-sub { font-size: 10px; }
+  .feat-dl-total { flex: 0 0 72px; }
+  .feat-dl-total-val { font-size: 16px; }
+  .feat-dl-total-sub { font-size: 9px; }
   .hiw-step { gap: 10px; }
   .hiw-desc { font-size: 13px; }
 }
