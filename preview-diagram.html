@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-variant="classic">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Diagram preview · Babil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(ellipse at top, #0E1A2E 0%, #06090F 60%);
+    color: #fff;
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 60px;
+    box-sizing: border-box;
+  }
+  .preview-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .preview-header .eyebrow {
+    color: #4A6A8A;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .preview-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .preview-header p {
+    margin: 8px 0 0;
+    color: #6A8098;
+    font-size: 14px;
+  }
+  .preview-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .preview-controls button {
+    background: #0A1020;
+    color: #C8D0DE;
+    border: 1px solid #1A2840;
+    border-radius: 100px;
+    padding: 8px 14px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .preview-controls button:hover {
+    background: #111D2E;
+    border-color: #263A58;
+  }
+  .preview-controls button.active {
+    background: #A78BFA22;
+    border-color: #A78BFA;
+    color: #A78BFA;
+  }
+  #root {
+    display: flex;
+    justify-content: center;
+  }
+  .footer-note {
+    margin-top: 36px;
+    color: #3A4258;
+    font-size: 12px;
+    text-align: center;
+    max-width: 480px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="preview-header">
+  <div class="eyebrow">Babil · Phone preview</div>
+  <h1>Wallet Structure diagram</h1>
+  <p>Standalone preview of the new <code>WalletDiagramMobile</code> screen.</p>
+</div>
+
+<div class="preview-controls" id="controls"></div>
+
+<div id="root"></div>
+
+<div class="footer-note">
+  This page mounts <code>&lt;Phone screen="..." /&gt;</code> in isolation so you can
+  inspect the in-app mockup without scrolling through the landing page. Edit
+  <code>app-screens.jsx</code> and reload to see changes.
+</div>
+
+<script type="text/babel" src="app-screens.jsx"></script>
+
+<script type="text/babel">
+  const SCREENS = [
+    { key: "diagram", label: "Wallet Structure" },
+    { key: "home",     label: "Home" },
+    { key: "stats",    label: "Stats" },
+    { key: "log",      label: "Work Log" },
+    { key: "wallet",   label: "Accounts" },
+    { key: "trip",     label: "Trip" },
+    { key: "lasvegas", label: "Las Vegas Trip" },
+  ];
+
+  function PreviewApp() {
+    const [screen, setScreen] = React.useState("diagram");
+    return (
+      <React.Fragment>
+        <div className="preview-controls" style={{ display: "none" }} />
+        <Phone screen={screen} />
+        {/* hidden — controls are rendered into the static container above */}
+        <ControlsPortal screen={screen} setScreen={setScreen} />
+      </React.Fragment>
+    );
+  }
+
+  function ControlsPortal({ screen, setScreen }) {
+    const host = document.getElementById("controls");
+    if (!host) return null;
+    return ReactDOM.createPortal(
+      <React.Fragment>
+        {SCREENS.map(s => (
+          <button
+            key={s.key}
+            className={s.key === screen ? "active" : ""}
+            onClick={() => setScreen(s.key)}
+          >
+            {s.label}
+          </button>
+        ))}
+      </React.Fragment>,
+      host
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(<PreviewApp />);
+</script>
+
+</body>
+</html>

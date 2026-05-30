@@ -634,9 +634,188 @@ function WalletScreen() {
   );
 }
 
+// ── Wallet Diagram (mobile port of WalletDiagramWeb, unlimited tier, vertical only)
+function WalletDiagramMobile() {
+  const tc = "#A78BFA";
+  const tripColor = "#FF7A2F";
+  const mainWallets = [
+    { name: "USA Account Wallet", currency: "USD",
+      accounts: [{ label: "Credit Card" }, { label: "Cash" }] },
+    { name: "UK Account Wallet", currency: "GBP",
+      accounts: [{ label: "Debit Card" }, { label: "Savings" }] },
+    { name: "Business Wallet", currency: "EUR",
+      accounts: [{ label: "Credit Card" }, { label: "Cash" }] },
+  ];
+  const tripWallets = [
+    { name: "Business Trip", currency: "GBP",
+      categories: [{ label: "Transport" }, { label: "Lodging" }] },
+    { name: "Paris", currency: "EUR",
+      categories: [{ label: "Lodging" }, { label: "Food" }] },
+    { name: "Festival", currency: "USD",
+      categories: [{ label: "Gifts" }, { label: "Food" }] },
+    { name: "Japan", currency: "JPY",
+      categories: [{ label: "Transport" }, { label: "Food" }] },
+  ];
+
+  const [vis, setVis] = React.useState(false);
+  const uid = React.useId().replace(/:/g, "");
+  React.useEffect(() => {
+    const t = setTimeout(() => setVis(true), 60);
+    return () => clearTimeout(t);
+  }, []);
+
+  const diagCSS = `
+    @keyframes wdmYouIn  { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
+    @keyframes wdmRing   { 0%{transform:translate(-50%,-50%) scale(1);opacity:0.55} 100%{transform:translate(-50%,-50%) scale(2.4);opacity:0} }
+    @keyframes wdmCardIn { from{opacity:0;transform:perspective(500px) rotateX(11deg) rotateY(-3deg) translateY(14px)} to{opacity:1;transform:perspective(500px) rotateX(11deg) rotateY(-3deg) translateY(0)} }
+    @keyframes wdmFloat  { 0%,100%{transform:perspective(500px) rotateX(11deg) rotateY(-3deg) translateY(0)} 50%{transform:perspective(500px) rotateX(11deg) rotateY(-3deg) translateY(-4px)} }
+    @keyframes wdmItemIn { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform:translateX(0)} }
+    @keyframes wdmGlow   { 0%,100%{opacity:0.3;transform:scaleX(0.75)} 50%{opacity:0.7;transform:scaleX(1.05)} }
+  `;
+
+  function ItemIconMini({ label }) {
+    const l = (label || "").toLowerCase();
+    const c = "rgba(255,255,255,0.44)"; const sw = "1.3";
+    if (l.includes("credit") || l.includes("debit") || l.includes("card"))
+      return <svg width="8" height="8" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke={c} strokeWidth={sw}/><line x1="2" y1="10" x2="22" y2="10" stroke={c} strokeWidth={sw}/><rect x="5" y="13" width="4" height="2" rx="0.5" fill={c}/></svg>;
+    if (l.includes("cash"))
+      return <svg width="8" height="8" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="20" height="12" rx="2" stroke={c} strokeWidth={sw}/><circle cx="12" cy="12" r="3" stroke={c} strokeWidth={sw}/><circle cx="5" cy="12" r="1" fill={c}/><circle cx="19" cy="12" r="1" fill={c}/></svg>;
+    if (l.includes("saving"))
+      return <svg width="8" height="8" viewBox="0 0 24 24" fill="none"><path d="M4 14c0-4.4 3.6-8 8-8s8 3.6 8 8v2H4v-2z" stroke={c} strokeWidth={sw} strokeLinejoin="round"/><path d="M8 18v1M16 18v1" stroke={c} strokeWidth={sw} strokeLinecap="round"/></svg>;
+    if (l.includes("transport"))
+      return <svg width="8" height="8" viewBox="0 0 24 24" fill="none"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 00-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" stroke={c} strokeWidth={sw} strokeLinejoin="round" strokeLinecap="round"/></svg>;
+    if (l.includes("lodging") || l.includes("hotel"))
+      return <svg width="8" height="8" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke={c} strokeWidth={sw} strokeLinejoin="round"/><rect x="9" y="14" width="6" height="8" stroke={c} strokeWidth={sw} strokeLinejoin="round"/></svg>;
+    if (l.includes("food"))
+      return <svg width="8" height="8" viewBox="0 0 24 24" fill="none"><line x1="18" y1="8" x2="18" y2="21" stroke={c} strokeWidth={sw} strokeLinecap="round"/><path d="M15 8a3 3 0 006 0" stroke={c} strokeWidth={sw} strokeLinecap="round"/><line x1="6" y1="3" x2="6" y2="21" stroke={c} strokeWidth={sw} strokeLinecap="round"/><line x1="3" y1="3" x2="3" y2="10" stroke={c} strokeWidth={sw} strokeLinecap="round"/><line x1="9" y1="3" x2="9" y2="10" stroke={c} strokeWidth={sw} strokeLinecap="round"/><line x1="3" y1="10" x2="9" y2="10" stroke={c} strokeWidth={sw} strokeLinecap="round"/></svg>;
+    if (l.includes("gift"))
+      return <svg width="8" height="8" viewBox="0 0 24 24" fill="none"><rect x="3" y="9" width="18" height="12" rx="1" stroke={c} strokeWidth={sw}/><rect x="3" y="6" width="18" height="3" rx="1" stroke={c} strokeWidth={sw}/><line x1="12" y1="6" x2="12" y2="21" stroke={c} strokeWidth={sw} strokeLinecap="round"/></svg>;
+    return <svg width="8" height="8" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="1.5" fill={c}/><circle cx="12" cy="12" r="1.5" fill={c}/><circle cx="19" cy="12" r="1.5" fill={c}/></svg>;
+  }
+
+  function WalletCard({ wallet, isTrip, idx }) {
+    const cc = isTrip ? tripColor : tc;
+    const items = isTrip ? wallet.categories : wallet.accounts;
+    const d = idx * 90; const fd = d + 620;
+    const n = (wallet.name || "").toLowerCase();
+    return (
+      <div style={{ position: "relative", flex: 1, minWidth: 0 }}>
+        <div style={{ position: "absolute", bottom: -5, left: "12%", right: "12%", height: 13, background: `radial-gradient(ellipse, ${cc}55 0%, transparent 70%)`, filter: "blur(5px)", pointerEvents: "none", animation: vis ? `wdmGlow 4s ease-in-out ${fd}ms infinite` : "none" }} />
+        <div style={{ background: `linear-gradient(148deg, ${cc}14 0%, ${cc}06 100%)`, border: `1px solid ${cc}55`, borderRadius: 10, padding: "8px 8px 7px", position: "relative", overflow: "hidden", boxShadow: `0 10px 26px rgba(0,0,0,0.6), 0 3px 8px rgba(0,0,0,0.32), inset 0 1px 0 ${cc}35`, animation: vis ? `wdmCardIn 0.55s cubic-bezier(0.16,1,0.3,1) ${d}ms both, wdmFloat 5s ease-in-out ${fd}ms infinite` : "none" }}>
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg,transparent,${cc}AA,transparent)` }} />
+          <div style={{ position: "absolute", top: 0, right: 0, width: 22, height: 22, background: `radial-gradient(circle at 100% 0%, ${cc}22 0%, transparent 70%)`, pointerEvents: "none" }} />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, gap: 4 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 5, minWidth: 0, flex: 1 }}>
+              <div style={{ width: 20, height: 20, borderRadius: 6, background: `${cc}22`, border: `1px solid ${cc}44`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {isTrip ? <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke={cc} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="9" r="2.5" stroke={cc} strokeWidth="1.4"/></svg>
+                : n.includes("business") ? <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="3" y="9" width="18" height="13" rx="1.5" stroke={cc} strokeWidth="1.5" strokeLinejoin="round"/><path d="M8 9V7a4 4 0 018 0v2" stroke={cc} strokeWidth="1.5" strokeLinecap="round"/></svg>
+                : n.includes("account") ? <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="2" y="8" width="20" height="13" rx="2" stroke={cc} strokeWidth="1.5" strokeLinejoin="round"/><path d="M8 8V6a4 4 0 018 0v2" stroke={cc} strokeWidth="1.5" strokeLinecap="round"/></svg>
+                : <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke={cc} strokeWidth="1.5"/><path d="M4.5 20c0-4 3.36-7 7.5-7s7.5 3 7.5 7" stroke={cc} strokeWidth="1.5" strokeLinecap="round"/></svg>}
+              </div>
+              <span style={{ color: "#E4EEF8", fontSize: 10.5, fontWeight: 700, fontFamily: "Space Grotesk, sans-serif", lineHeight: 1.15, letterSpacing: "-0.01em", overflow: "hidden", textOverflow: "ellipsis" }}>{wallet.name}</span>
+            </div>
+            <span style={{ color: cc, fontSize: 7.5, fontWeight: 800, background: `${cc}1A`, border: `1px solid ${cc}40`, borderRadius: 3, padding: "1.5px 4px", letterSpacing: "0.05em", fontFamily: "Space Grotesk, sans-serif", flexShrink: 0 }}>{wallet.currency}</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {items.map((it, ii) => (
+              <div key={it.label} style={{ display: "flex", alignItems: "center", gap: 5, padding: "2.5px 6px", borderLeft: `1.5px solid ${cc}40`, background: `${cc}06`, borderRadius: "0 3px 3px 0", opacity: vis ? 1 : 0, animation: vis ? `wdmItemIn 0.36s ease ${d + 200 + ii * 50}ms both` : "none" }}>
+                <ItemIconMini label={it.label} />
+                <span style={{ color: "#6A8098", fontSize: 9.5, fontWeight: 500, letterSpacing: "0.01em" }}>{it.label}</span>
+              </div>
+            ))}
+            {!isTrip && (
+              <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "2.5px 6px", borderLeft: `1.5px dashed ${cc}28`, borderRadius: "0 3px 3px 0", opacity: vis ? 0.45 : 0, animation: vis ? `wdmItemIn 0.36s ease ${d + 200 + items.length * 50}ms both` : "none" }}>
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke={cc} strokeWidth="1.8" strokeLinecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke={cc} strokeWidth="1.8" strokeLinecap="round"/></svg>
+                <span style={{ color: `${cc}80`, fontSize: 8.5, fontWeight: 600, letterSpacing: "0.04em", fontFamily: "Space Grotesk, sans-serif" }}>Add account</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const total = mainWallets.length + tripWallets.length;
+  const S = { fontFamily: "system-ui, -apple-system, sans-serif" };
+
+  return (
+    <div style={{ ...S, width: "100%", height: "100%", background: "#0D1117", color: "#fff", overflow: "hidden", position: "relative", display: "flex", flexDirection: "column" }}>
+      <StatusBar />
+
+      {/* Header */}
+      <div style={{ padding: "8px 20px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #1E2640" }}>
+        <div>
+          <div style={{ color: "#4A6A8A", fontSize: 8.5, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 2, fontFamily: "Space Grotesk, sans-serif" }}>Babil · Structure</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", fontFamily: "Space Grotesk, sans-serif", letterSpacing: "-0.02em" }}>Wallet Structure</div>
+        </div>
+        <div style={{ padding: "3px 9px", borderRadius: 100, background: `${tc}18`, border: `1px solid ${tc}55`, color: tc, fontSize: 9.5, fontWeight: 700, letterSpacing: "0.05em", fontFamily: "Space Grotesk, sans-serif" }}>UNLIMITED</div>
+      </div>
+
+      {/* Scrollable diagram */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px 14px", paddingBottom: 88, background: "linear-gradient(168deg, #070E1C 0%, #040810 100%)", position: "relative" }}>
+        <style>{diagCSS}</style>
+        <div style={{ position: "absolute", top: 80, left: "50%", transform: "translate(-50%,-50%)", width: 280, height: 160, borderRadius: "50%", background: `radial-gradient(ellipse, ${tc}12 0%, transparent 70%)`, pointerEvents: "none" }} />
+
+        <div style={{ position: "relative" }}>
+          {/* You bubble */}
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 10, position: "relative" }}>
+            {vis && [0, 1, 2].map(i => (
+              <div key={i} style={{ position: "absolute", top: "50%", left: "50%", width: 38, height: 38, borderRadius: "50%", border: `1.5px solid ${tc}65`, animation: `wdmRing 2.8s ease-out ${i * 0.9}s infinite`, pointerEvents: "none" }} />
+            ))}
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: `${tc}18`, border: `1.5px solid ${tc}65`, borderRadius: 100, padding: "6px 13px 6px 7px", boxShadow: `0 0 18px ${tc}40, 0 0 36px ${tc}18`, animation: vis ? "wdmYouIn 0.5s cubic-bezier(0.16,1,0.3,1) both" : "none", position: "relative", zIndex: 2 }}>
+              <div style={{ width: 20, height: 20, borderRadius: "50%", background: `${tc}32`, border: `1px solid ${tc}60`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke={tc} strokeWidth="1.6"/><path d="M4.5 20c0-4 3.36-7 7.5-7s7.5 3 7.5 7" stroke={tc} strokeWidth="1.6" strokeLinecap="round"/></svg>
+              </div>
+              <span style={{ color: "#fff", fontSize: 13, fontWeight: 700, fontFamily: "Space Grotesk, sans-serif" }}>You</span>
+            </div>
+          </div>
+
+          {/* Connector */}
+          <svg width="100%" height="22" style={{ display: "block", overflow: "visible", marginBottom: 4 }}>
+            <defs>
+              <linearGradient id={`${uid}v`} x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor={tc} stopOpacity="0.85"/><stop offset="100%" stopColor={tc} stopOpacity="0.08"/></linearGradient>
+              <linearGradient id={`${uid}h`} x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor={tc} stopOpacity="0.04"/><stop offset="50%" stopColor={tc} stopOpacity="0.45"/><stop offset="100%" stopColor={tc} stopOpacity="0.04"/></linearGradient>
+            </defs>
+            <line x1="50%" y1="0" x2="50%" y2="16" stroke={`url(#${uid}v)`} strokeWidth="1.5" strokeLinecap="round" strokeDasharray="18" style={{ strokeDashoffset: vis ? 0 : 18, transition: "stroke-dashoffset 0.35s 0.1s ease" }} />
+            {total > 1 && <line x1="10%" y1="16" x2="90%" y2="16" stroke={`url(#${uid}h)`} strokeWidth="1.2" strokeDasharray="400" style={{ strokeDashoffset: vis ? 0 : 400, transition: "stroke-dashoffset 0.5s 0.22s ease" }} />}
+          </svg>
+
+          {/* Main wallets */}
+          {mainWallets.length > 0 && (
+            <div>
+              <div style={{ fontSize: 8, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.13em", color: "#3A5570", marginBottom: 6, textAlign: "center", fontFamily: "Space Grotesk, sans-serif" }}>Main Wallets</div>
+              <div style={{ display: "grid", gridTemplateColumns: mainWallets.length <= 2 ? `repeat(${mainWallets.length},1fr)` : "1fr 1fr", gap: 7 }}>
+                {mainWallets.map((w, i) => <WalletCard key={w.name} wallet={w} isTrip={false} idx={i} />)}
+              </div>
+            </div>
+          )}
+
+          {/* Divider */}
+          {tripWallets.length > 0 && mainWallets.length > 0 && (
+            <div style={{ margin: "12px 0 8px", display: "flex", alignItems: "center", gap: 7 }}>
+              <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg,transparent,${tc}22)` }} />
+              <span style={{ fontSize: 8, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.13em", color: "#3A5570", fontFamily: "Space Grotesk, sans-serif", flexShrink: 0 }}>Trip Wallets</span>
+              <div style={{ flex: 1, height: 1, background: `linear-gradient(90deg,${tripColor}22,transparent)` }} />
+            </div>
+          )}
+
+          {/* Trip wallets */}
+          {tripWallets.length > 0 && (
+            <div style={{ display: "grid", gridTemplateColumns: tripWallets.length <= 2 ? `repeat(${tripWallets.length},1fr)` : "1fr 1fr", gap: 7 }}>
+              {tripWallets.map((w, i) => <WalletCard key={w.name} wallet={w} isTrip={true} idx={mainWallets.length + i} />)}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <BottomTabs active="wallet" />
+    </div>
+  );
+}
+
 // ── Phone container
 function Phone({ screen = "home", style = {} }) {
-  const screens = { home: <HomeScreen />, stats: <StatsScreen />, log: <DailyLogScreen />, wallet: <WalletScreen />, trip: <TripWalletScreen />, lasvegas: <LasVegasTripScreen /> };
+  const screens = { home: <HomeScreen />, stats: <StatsScreen />, log: <DailyLogScreen />, wallet: <WalletScreen />, trip: <TripWalletScreen />, lasvegas: <LasVegasTripScreen />, diagram: <WalletDiagramMobile /> };
   return (
     <div className="phone" style={style}>
       <span className="side-btn-l1"></span>
