@@ -867,6 +867,12 @@ footer { padding: 64px 0 32px; border-top: 1px solid var(--border-ghost); margin
   /* Footer */
   .footer-grid { grid-template-columns: 1fr !important; gap: 28px; }
   .footer-bot { flex-direction: column; gap: 10px; text-align: center; align-items: center; }
+  /* Work Log earn text — bar yüksekliği için üstte alan aç */
+  .feat-dl-week { padding-top: 72px; }
+  /* Wallet modal grid → tek kolon */
+  .wallet-modal-grid { grid-template-columns: 1fr !important; }
+  .wallet-modal-left { grid-column: span 1 !important; }
+  .wallet-tier-sub { display: none !important; }
   /* Feature block bottom 2-kolon → mobilde dikey sırala */
   .feat-block-bottom { grid-template-columns: 1fr !important; }
   .feat-block-bottom > div:first-child { border-right: none; border-bottom: 1px solid var(--border); }

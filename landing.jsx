@@ -1416,7 +1416,7 @@ function WalletExplainerModal({ onClose, triggerRef }) {
                   <div style={{ width:7,height:7,borderRadius:"50%",background:s.tierColor,boxShadow:active?`0 0 8px ${s.tierColor}CC`:"none",transition:"box-shadow 0.2s" }} />
                   <span style={{ color:active?s.tierColor:"#4A6A8A",fontSize:17.5,fontWeight:700,fontFamily:"Space Grotesk, sans-serif",letterSpacing:"0.02em",transition:"color 0.2s" }}>{s.tier}</span>
                 </div>
-                <span style={{ color:active?s.tierColor+"BB":"#2E4060",fontSize:12.5,fontWeight:500,transition:"color 0.2s" }}>
+                <span className="wallet-tier-sub" style={{ color:active?s.tierColor+"BB":"#2E4060",fontSize:12.5,fontWeight:500,transition:"color 0.2s" }}>
                   {s.id === "free" ? "1 main wallet · 1 trip wallet" : s.id === "premium" ? "3 main wallets · 4 trip wallets" : "∞ main wallets · ∞ trip wallets"}
                 </span>
               </button>
@@ -1441,8 +1441,8 @@ function WalletExplainerModal({ onClose, triggerRef }) {
           </p>
 
           {/* Two wallet types + Common use cases side by side */}
-          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,alignItems:"stretch" }}>
-            <div style={{ gridColumn:"span 2", display:"flex", flexDirection:"column", gap:12 }}>
+          <div className="wallet-modal-grid" style={{ display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,alignItems:"stretch" }}>
+            <div className="wallet-modal-left" style={{ gridColumn:"span 2", display:"flex", flexDirection:"column", gap:12 }}>
               <div>
                 <div style={{ fontSize:11.3,fontWeight:700,letterSpacing:"0.14em",textTransform:"uppercase",color:"#4A6A8A",marginBottom:9,fontFamily:"Space Grotesk, sans-serif" }}>Two wallet types</div>
                 <div style={{ display:"flex",flexDirection:"column",gap:7 }}>
