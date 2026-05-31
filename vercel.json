@@ -6,6 +6,6 @@
   "installCommand": null,
   "outputDirectory": ".",
   "rewrites": [
-    { "source": "/work-summary/:id", "destination": "/work-summary.html" }
+    { "source": "/work-summary/:id", "destination": "/work-summary" }
   ]
 }
