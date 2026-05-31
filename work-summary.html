@@ -53,8 +53,8 @@
   .jobdetail{display:none;margin:-4px 0 12px 18px;border-left:1px solid var(--border);padding-left:12px}
   .jobdetail.open{display:block}
   .dayrow{display:flex;align-items:center;padding:5px 0}
-  .dayrow .dd{width:64px;color:var(--text2);font-size:13px}
-  .dayrow .dh{flex:1;color:var(--text);font-size:13px}
+  .dayrow .dd{flex:1;color:var(--text2);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dayrow .dh{width:56px;text-align:right;margin-right:12px;color:var(--text);font-size:13px}
   .dayrow .de{color:var(--green);font-size:13px;font-weight:600}
   .net{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:14px;margin-top:6px}
   .net .l{color:var(--text2);font-size:13px;font-weight:700;letter-spacing:.5px}
@@ -122,8 +122,9 @@
   function fmtInt(sym,v){return sym + Math.round(v||0).toLocaleString('en-US');}
   function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var WEEKDAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   function fmtHrs(h){return h>0 ? (h%1===0?h:h.toFixed(1))+'h' : '—';}
-  function fmtDay(ds){var p=String(ds||'').split('-');return p.length===3 ? MONTHS[parseInt(p[1],10)-1]+' '+parseInt(p[2],10) : (ds||'');}
+  function fmtDay(ds){var p=String(ds||'').split('-');if(p.length!==3)return ds||'';var mo=parseInt(p[1],10)-1,d=parseInt(p[2],10),wd=WEEKDAYS[new Date(parseInt(p[0],10),mo,d).getDay()];return wd+', '+MONTHS[mo]+' '+d;}
 
   // Extract the summary id from /work-summary/<id> (or ?id=).
   var parts = location.pathname.split('/').filter(Boolean);
