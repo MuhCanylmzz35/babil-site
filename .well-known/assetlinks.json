@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.babilfinance.app",
+      "sha256_cert_fingerprints": [
+        "A5:37:A8:C6:11:FD:8B:55:31:FC:C7:E1:C7:56:12:51:F3:6F:47:6F:0E:54:2A:A3:AD:F0:CF:CF:AF:23:04:F4"
+      ]
+    }
+  }
+]

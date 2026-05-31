@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Work Summary — Babil</title>
+<meta name="description" content="See this work summary — hours, earnings, and more — on Babil." />
+<meta property="og:title" content="Work Summary on Babil" />
+<meta property="og:description" content="Hours worked, earnings, and job breakdown — see the full recap on Babil." />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="https://babilfinance.com/assets/icon.png" />
+<meta name="theme-color" content="#0D1117" />
+<link rel="icon" type="image/png" href="assets/favicon.png" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+<style>
+  :root{
+    --bg:#0D1117; --card:#161B2C; --border:#1E2640; --primary:#6C63FF; --primary-muted:#A78BFA;
+    --green:#00D4AA; --red:#FF5C5C; --amber:#FFB547; --text:#FFFFFF; --text2:#8A94A6; --dim:#3A4258;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px 16px 48px}
+  .wrap{width:100%;max-width:420px}
+  .brandrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px}
+  .logo{width:26px;height:26px}
+  .badge{background:rgba(108,99,255,.13);border:1px solid rgba(108,99,255,.35);color:var(--primary-muted);
+    font-size:10px;font-weight:800;letter-spacing:1px;padding:5px 10px;border-radius:8px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px;margin-bottom:16px}
+  h1{font-size:24px;font-weight:800;margin-bottom:2px}
+  .period{color:var(--text2);font-size:13px;font-weight:600;margin-bottom:20px}
+  .hero{display:flex;gap:14px;margin-bottom:14px}
+  .hero .col{flex:1}
+  .big{font-size:30px;font-weight:800;line-height:1.05}
+  .lbl{color:var(--text2);font-size:11px;font-weight:700;letter-spacing:.5px;margin-top:4px}
+  .sec{display:flex;gap:14px;margin-top:4px}
+  .sec .col{flex:1}
+  .mid{font-size:17px;font-weight:700}
+  .jobs{margin-top:18px;border-top:1px solid var(--border);padding-top:16px}
+  .job{display:flex;align-items:center;margin-bottom:12px}
+  .dot{width:8px;height:8px;border-radius:4px;margin-right:10px;flex:none}
+  .job .nm{flex:1;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .job .hr{color:var(--text2);font-size:13px;margin-right:12px}
+  .job .er{color:var(--green);font-size:14px;font-weight:700}
+  .net{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:14px;margin-top:6px}
+  .net .l{color:var(--text2);font-size:13px;font-weight:700;letter-spacing:.5px}
+  .cta{display:block;width:100%;background:var(--primary);color:#fff;text-align:center;text-decoration:none;
+    font-size:16px;font-weight:700;padding:16px;border-radius:14px;margin-top:6px}
+  .ghost{display:block;width:100%;text-align:center;text-decoration:none;color:var(--primary-muted);
+    font-size:14px;font-weight:600;padding:14px;margin-top:4px}
+  .foot{color:var(--dim);font-size:12px;text-align:center;margin-top:18px;line-height:1.5}
+  .muted{color:var(--text2)}
+  .center{text-align:center}
+  .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;
+    animation:spin 1s linear infinite;margin:40px auto}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brandrow">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB547"/><stop offset="1" stop-color="#FF6B35"/></linearGradient></defs>
+        <path d="M60,10 L102,35 L102,85 L60,110 L18,85 L18,35 Z" fill="none" stroke="url(#g)" stroke-width="6" stroke-linejoin="round"/>
+        <line x1="42" y1="82" x2="42" y2="62" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
+        <line x1="60" y1="82" x2="60" y2="48" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
+        <line x1="78" y1="82" x2="78" y2="32" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
+      </svg>
+      <span>Babil</span>
+    </div>
+    <span class="badge">WORK SUMMARY</span>
+  </div>
+
+  <div id="loading"><div class="spinner"></div></div>
+
+  <div id="content" class="hidden"></div>
+
+  <div id="notfound" class="hidden">
+    <div class="card center">
+      <h1 style="font-size:20px">Summary not available</h1>
+      <p class="muted" style="margin-top:8px;font-size:14px;line-height:1.5">This work summary may have been removed or the link is invalid.</p>
+    </div>
+  </div>
+
+  <a id="openBtn" class="cta hidden" href="#">Open in Babil app</a>
+  <a id="getBtn" class="ghost hidden" href="https://babilfinance.com">Don't have Babil? Get the app</a>
+
+  <p class="foot">Babil — track your work, earnings, and spending.<br/>Share your own recap with friends.</p>
+</div>
+
+<script>
+(function(){
+  var SUPABASE_URL = "https://nucsizdduvpojjtvayvn.supabase.co";
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51Y3NpemRkdXZwb2pqdHZheXZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MTM4MDksImV4cCI6MjA5NDI4OTgwOX0.CSQLhokxnSC6E3BuXbeVil6kjg39QkI9ABF0fNgqQgg";
+
+  // App Store links — update once the app is published.
+  var STORE_HOME = "https://babilfinance.com";
+
+  var CUR = {USD:"$",EUR:"€",GBP:"£",TRY:"₺",JPY:"¥",CAD:"$",AUD:"$",CHF:"CHF",CNY:"¥",INR:"₹",
+    RUB:"₽",BRL:"R$",MXN:"$",KRW:"₩",SEK:"kr",NOK:"kr",DKK:"kr",PLN:"zł",ZAR:"R",AED:"د.إ",
+    SAR:"﷼",THB:"฿",IDR:"Rp",MYR:"RM",PHP:"₱",SGD:"$",HKD:"$",NZD:"$",CZK:"Kč",HUF:"Ft",ILS:"₪",
+    CLP:"$",COP:"$",ARS:"$",EGP:"E£",NGN:"₦",VND:"₫",UAH:"₴"};
+
+  var COLORS = ['#4E79A7','#59A14F','#9C755F','#F28E2B','#E15759','#76B7B2','#EDC948','#B07AA1','#FF9DA7','#8CD17D','#BAB0AC','#86BCB6','#D4A6C8','#CFCFCF','#A0CBE8','#FFBE7D'];
+  function stableColor(name){var h=0;for(var i=0;i<name.length;i++){h=(h*31+name.charCodeAt(i))|0;}return COLORS[Math.abs(h)%COLORS.length];}
+  function fmtInt(sym,v){return sym + Math.round(v||0).toLocaleString('en-US');}
+  function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+  // Extract the summary id from /work-summary/<id> (or ?id=).
+  var parts = location.pathname.split('/').filter(Boolean);
+  var last = parts.length ? parts[parts.length-1] : '';
+  var id = (last && last.indexOf('work-summary') === -1) ? last : (new URLSearchParams(location.search).get('id') || '');
+  id = decodeURIComponent(id);
+
+  var deepLink = 'babilfinance://work-summary/' + id;
+  var $loading = document.getElementById('loading');
+  var $content = document.getElementById('content');
+  var $notfound = document.getElementById('notfound');
+  var $openBtn = document.getElementById('openBtn');
+  var $getBtn = document.getElementById('getBtn');
+
+  function showOpenButtons(){
+    $openBtn.href = deepLink;
+    $openBtn.classList.remove('hidden');
+    $getBtn.href = STORE_HOME;
+    $getBtn.classList.remove('hidden');
+  }
+
+  if(!id){ $loading.classList.add('hidden'); $notfound.classList.remove('hidden'); return; }
+
+  fetch(SUPABASE_URL + '/rest/v1/work_summaries?id=eq.' + encodeURIComponent(id) + '&select=summary_data,start_date,end_date', {
+    headers: { apikey: ANON, Authorization: 'Bearer ' + ANON }
+  }).then(function(r){ return r.json(); }).then(function(rows){
+    $loading.classList.add('hidden');
+    var row = rows && rows.length ? rows[0] : null;
+    if(!row || !row.summary_data){ $notfound.classList.remove('hidden'); showOpenButtons(); return; }
+    render(row.summary_data);
+    showOpenButtons();
+  }).catch(function(){
+    $loading.classList.add('hidden');
+    $notfound.classList.remove('hidden');
+    showOpenButtons();
+  });
+
+  function render(d){
+    var s = d.stats || {};
+    var sym = CUR[s.currency] || '$';
+    var totalEarned = (s.totalEarnings||0) + (s.extraTotal||0);
+    var net = totalEarned - (s.totalSpent||0);
+    var jobs = (s.jobs||[]).slice(0,4);
+    var hrs = s.totalHours>0 ? (s.totalHours % 1 === 0 ? s.totalHours : s.totalHours.toFixed(1)) + 'h' : '0h';
+
+    var html = '<div class="card">';
+    html += '<h1>' + (d.createdByName ? esc(d.createdByName) + "'s recap" : 'Work recap') + '</h1>';
+    html += '<div class="period">' + esc(d.periodLabel||'') + (d.days ? '  ·  ' + d.days + (d.days===1?' day':' days') : '') + '</div>';
+
+    html += '<div class="hero">';
+    html += '<div class="col"><div class="big">' + hrs + '</div><div class="lbl">HOURS WORKED</div></div>';
+    html += '<div class="col"><div class="big" style="color:var(--green)">' + fmtInt(sym,totalEarned) + '</div><div class="lbl">EARNED</div></div>';
+    html += '</div>';
+
+    html += '<div class="sec">';
+    html += '<div class="col"><div class="mid" style="color:var(--amber)">' + (s.hourlyRate!=null ? fmtInt(sym,s.hourlyRate)+'/h' : '—') + '</div><div class="lbl">AVG PER HOUR</div></div>';
+    if(d.showExpenses){ html += '<div class="col"><div class="mid" style="color:var(--red)">' + fmtInt(sym,s.totalSpent) + '</div><div class="lbl">SPENT</div></div>'; }
+    else { html += '<div class="col"><div class="mid">' + (d.days||'—') + '</div><div class="lbl">DAYS</div></div>'; }
+    html += '</div>';
+
+    if(jobs.length){
+      html += '<div class="jobs">';
+      jobs.forEach(function(j){
+        var c = stableColor(j.name);
+        var jh = j.hours>0 ? (j.hours%1===0?j.hours:j.hours.toFixed(1))+'h' : '—';
+        html += '<div class="job"><span class="dot" style="background:'+c+'"></span><span class="nm">'+esc(j.name)+'</span><span class="hr">'+jh+'</span><span class="er">'+fmtInt(sym,j.earnings)+'</span></div>';
+      });
+      html += '</div>';
+    }
+
+    if(d.showExpenses){
+      var nc = net>=0 ? 'var(--green)' : 'var(--red)';
+      html += '<div class="net"><span class="l">NET SAVED</span><span style="color:'+nc+';font-size:18px;font-weight:800">'+(net<0?'-':'')+fmtInt(sym,Math.abs(net))+'</span></div>';
+    }
+
+    html += '</div>';
+    $content.innerHTML = html;
+    $content.classList.remove('hidden');
+  }
+})();
+</script>
+</body>
+</html>
