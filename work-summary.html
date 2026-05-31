@@ -38,6 +38,7 @@
   .sec .col{flex:1}
   .mid{font-size:17px;font-weight:700}
   .jobs{margin-top:18px;border-top:1px solid var(--border);padding-top:16px}
+  .seclbl{color:var(--text2);font-size:10px;font-weight:800;letter-spacing:.5px;margin-bottom:10px}
   .job{display:flex;align-items:center;margin-bottom:12px}
   .dot{width:8px;height:8px;border-radius:4px;margin-right:10px;flex:none}
   .job .nm{flex:1;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -174,6 +175,15 @@
         var c = stableColor(j.name);
         var jh = j.hours>0 ? (j.hours%1===0?j.hours:j.hours.toFixed(1))+'h' : '—';
         html += '<div class="job"><span class="dot" style="background:'+c+'"></span><span class="nm">'+esc(j.name)+'</span><span class="hr">'+jh+'</span><span class="er">'+fmtInt(sym,j.earnings)+'</span></div>';
+      });
+      html += '</div>';
+    }
+
+    var extras = (s.extraItems||[]).slice(0,4);
+    if(extras.length){
+      html += '<div class="jobs"><div class="seclbl">TIPS &amp; BONUSES</div>';
+      extras.forEach(function(e){
+        html += '<div class="job"><span class="dot" style="background:#FFB547"></span><span class="nm">'+esc(e.source)+'</span><span class="er">'+fmtInt(sym,e.amount)+'</span></div>';
       });
       html += '</div>';
     }
