@@ -44,6 +44,18 @@
   .job .nm{flex:1;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .job .hr{color:var(--text2);font-size:13px;margin-right:12px}
   .job .er{color:var(--green);font-size:14px;font-weight:700}
+  .jobrow{display:flex;align-items:center;margin-bottom:12px}
+  .jobrow .nm{flex:1;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .jobrow .hr{color:var(--text2);font-size:13px;margin-right:12px}
+  .jobrow .er{color:var(--green);font-size:14px;font-weight:700}
+  .jobrow.clickable{cursor:pointer}
+  .chev{color:var(--text2);font-size:12px;margin-left:8px;width:12px;text-align:center;flex:none}
+  .jobdetail{display:none;margin:-4px 0 12px 18px;border-left:1px solid var(--border);padding-left:12px}
+  .jobdetail.open{display:block}
+  .dayrow{display:flex;align-items:center;padding:5px 0}
+  .dayrow .dd{width:64px;color:var(--text2);font-size:13px}
+  .dayrow .dh{flex:1;color:var(--text);font-size:13px}
+  .dayrow .de{color:var(--green);font-size:13px;font-weight:600}
   .net{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:14px;margin-top:6px}
   .net .l{color:var(--text2);font-size:13px;font-weight:700;letter-spacing:.5px}
   .cta{display:block;width:100%;background:var(--primary);color:#fff;text-align:center;text-decoration:none;
@@ -109,6 +121,9 @@
   function stableColor(name){var h=0;for(var i=0;i<name.length;i++){h=(h*31+name.charCodeAt(i))|0;}return COLORS[Math.abs(h)%COLORS.length];}
   function fmtInt(sym,v){return sym + Math.round(v||0).toLocaleString('en-US');}
   function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function fmtHrs(h){return h>0 ? (h%1===0?h:h.toFixed(1))+'h' : '—';}
+  function fmtDay(ds){var p=String(ds||'').split('-');return p.length===3 ? MONTHS[parseInt(p[1],10)-1]+' '+parseInt(p[2],10) : (ds||'');}
 
   // Extract the summary id from /work-summary/<id> (or ?id=).
   var parts = location.pathname.split('/').filter(Boolean);
@@ -171,10 +186,24 @@
 
     if(jobs.length){
       html += '<div class="jobs">';
-      jobs.forEach(function(j){
+      jobs.forEach(function(j, idx){
         var c = stableColor(j.name);
-        var jh = j.hours>0 ? (j.hours%1===0?j.hours:j.hours.toFixed(1))+'h' : '—';
-        html += '<div class="job"><span class="dot" style="background:'+c+'"></span><span class="nm">'+esc(j.name)+'</span><span class="hr">'+jh+'</span><span class="er">'+fmtInt(sym,j.earnings)+'</span></div>';
+        var days = j.days || [];
+        var hasDays = days.length > 0;
+        html += '<div class="jobrow' + (hasDays ? ' clickable' : '') + '" data-idx="'+idx+'">'
+          + '<span class="dot" style="background:'+c+'"></span>'
+          + '<span class="nm">'+esc(j.name)+'</span>'
+          + '<span class="hr">'+fmtHrs(j.hours)+'</span>'
+          + '<span class="er">'+fmtInt(sym,j.earnings)+'</span>'
+          + (hasDays ? '<span class="chev" id="ch'+idx+'">▾</span>' : '')
+          + '</div>';
+        if(hasDays){
+          html += '<div class="jobdetail" id="jd'+idx+'">';
+          days.forEach(function(dd){
+            html += '<div class="dayrow"><span class="dd">'+fmtDay(dd.date)+'</span><span class="dh">'+fmtHrs(dd.hours)+'</span><span class="de">'+fmtInt(sym,dd.earnings)+'</span></div>';
+          });
+          html += '</div>';
+        }
       });
       html += '</div>';
     }
@@ -196,6 +225,16 @@
     html += '</div>';
     $content.innerHTML = html;
     $content.classList.remove('hidden');
+
+    // Expand/collapse a job's per-day breakdown on tap.
+    Array.prototype.forEach.call($content.querySelectorAll('.jobrow.clickable'), function(row){
+      row.addEventListener('click', function(){
+        var idx = row.getAttribute('data-idx');
+        var d = document.getElementById('jd'+idx);
+        var ch = document.getElementById('ch'+idx);
+        if(d){ var open = d.classList.toggle('open'); if(ch) ch.textContent = open ? '▴' : '▾'; }
+      });
+    });
   }
 })();
 </script>
