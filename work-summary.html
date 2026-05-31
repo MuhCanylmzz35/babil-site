@@ -23,6 +23,7 @@
   .wrap{width:100%;max-width:420px}
   .brandrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
   .brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px}
+  .brandname{background:linear-gradient(135deg,#FFB547,#FF6B35);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
   .logo{width:26px;height:26px}
   .badge{background:rgba(108,99,255,.13);border:1px solid rgba(108,99,255,.35);color:var(--primary-muted);
     font-size:10px;font-weight:800;letter-spacing:1px;padding:5px 10px;border-radius:8px}
@@ -62,13 +63,13 @@
   <div class="brandrow">
     <div class="brand">
       <svg class="logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB547"/><stop offset="1" stop-color="#FF6B35"/></linearGradient></defs>
+        <defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="18" y1="10" x2="102" y2="110"><stop offset="0" stop-color="#FFB547"/><stop offset="1" stop-color="#FF6B35"/></linearGradient></defs>
         <path d="M60,10 L102,35 L102,85 L60,110 L18,85 L18,35 Z" fill="none" stroke="url(#g)" stroke-width="6" stroke-linejoin="round"/>
         <line x1="42" y1="82" x2="42" y2="62" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
         <line x1="60" y1="82" x2="60" y2="48" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
         <line x1="78" y1="82" x2="78" y2="32" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
       </svg>
-      <span>Babil</span>
+      <span class="brandname">Babil</span>
     </div>
     <span class="badge">WORK SUMMARY</span>
   </div>
@@ -87,7 +88,7 @@
   <a id="openBtn" class="cta hidden" href="#">Open in Babil app</a>
   <a id="getBtn" class="ghost hidden" href="https://babilfinance.com">Don't have Babil? Get the app</a>
 
-  <p class="foot">Babil — track your work, earnings, and spending.<br/>Share your own recap with friends.</p>
+  <p class="foot">Babil helps you track your work, earnings, and spending.<br/>Share your own recap with friends.</p>
 </div>
 
 <script>
