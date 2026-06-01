@@ -25,7 +25,7 @@
   <div class="wrap">
     <a class="back" href="/">&larr; Babil</a>
     <h1>Privacy Policy</h1>
-    <p class="meta">Last updated: May 23, 2026</p>
+    <p class="meta">Last updated: June 1, 2026</p>
 
     <p>This Privacy Policy explains how Salim Can Yılmaz ("Developer", "we", "us"), an
     individual developer resident in Türkiye, collects, uses, and protects your
@@ -47,12 +47,17 @@
       accounts, transfers, balances, daily work logs, and any notes or descriptions
       you choose to add. This data is entered manually by you — Babil does not connect
       to your bank or any external financial institution.</li>
+      <li><strong>Subscription and purchase data:</strong> if you buy an optional
+      paid subscription, we store your subscription status — the plan you are on and
+      its start, renewal, trial, and expiry dates. Payments are processed by the app
+      store; we never receive or store your payment card details.</li>
     </ul>
 
     <p><strong>What we do NOT collect:</strong><br />
     Babil contains no advertising, no behavioral analytics, no crash reporting
     services, and no third-party tracking SDKs. We do not collect your location,
-    contacts, photos, device identifiers (IDFA / GAID), or any usage analytics. The
+    contacts, photos, device identifiers (IDFA / GAID), or any usage analytics.
+    Other than your account details and the subscription status described above, the
     only data we hold is what you manually enter into the app.</p>
 
     <p><strong>Device permissions we request:</strong></p>
@@ -77,6 +82,7 @@
       <li>To create, authenticate, and secure your account.</li>
       <li>To store and display the financial records you enter.</li>
       <li>To sync your data across sessions and devices linked to your account.</li>
+      <li>To process your subscription purchases and grant access to paid features.</li>
       <li>To send essential account emails, such as email verification and password
       reset messages.</li>
     </ul>
@@ -127,9 +133,19 @@
       <li><strong>Supabase</strong> — database, authentication, and data storage.</li>
       <li><strong>Brevo</strong> — delivery of transactional account emails
       (verification and password reset).</li>
+      <li><strong>RevenueCat</strong> — subscription management and purchase
+      validation. When you subscribe, RevenueCat receives a pseudonymous account
+      identifier and your purchase and subscription status in order to grant or
+      revoke access to paid features. RevenueCat does not receive your name, email,
+      or financial records.</li>
     </ul>
     <p>These providers process data only as needed to provide their service and are
     bound by their own privacy policies.</p>
+    <p><strong>Subscriptions and purchases:</strong> Babil offers optional paid
+    subscriptions (Premium and Unlimited). Subscriptions are sold and processed by
+    the Google Play Store (and, in the future, the Apple App Store), which handle all
+    payment details. We use RevenueCat to validate purchases and to track which plan
+    you are entitled to. We never collect or store your payment card information.</p>
 
     <h2>5. Data Retention</h2>
     <p>We retain your personal information and financial data for as long as your
@@ -143,6 +159,13 @@
       <li>Transactional email logs held by Brevo are automatically deleted per Brevo's
       retention policy (typically within 30 days).</li>
     </ul>
+    <p><strong>Subscriptions:</strong> Deleting your account does not automatically
+    cancel an active subscription. Auto-renewable subscriptions continue under your
+    Google or Apple account until you cancel them in the Google Play Store or Apple
+    App Store. Records of your purchases and subscription status — held by us, by
+    RevenueCat, and by the app stores — may be retained as required to provide the
+    service and to meet legal, tax, and app-store record-keeping obligations, even
+    after your account is deleted.</p>
     <p>We do not retain personal data beyond what is needed to operate the service or
     comply with applicable legal obligations. In the event of a legal hold (for
     example, in response to a valid court order), we will notify you to the extent
@@ -205,6 +228,9 @@
       infrastructure in the United States and/or EU.</li>
       <li><strong>Brevo</strong> (transactional email) — processes your email address
       to deliver account emails; servers may be located in the EU or US.</li>
+      <li><strong>RevenueCat</strong> (subscription management) — processes a
+      pseudonymous account identifier and your purchase status; cloud infrastructure
+      in the United States.</li>
     </ul>
 
     <p><strong>Under Turkish law (KVKK Article 9):</strong><br />
@@ -251,6 +277,8 @@
       <li>Personal records: financial data you manually enter (expenses, incomes,
       wallets, accounts, daily work logs).</li>
       <li>Demographic data: age range (optional, provided during onboarding).</li>
+      <li>Commercial information: subscription and purchase status (plan, renewal,
+      and expiry dates).</li>
     </ul>
 
     <p>We do NOT sell your personal information. We do not share personal information
