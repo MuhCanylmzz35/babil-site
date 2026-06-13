@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Babil Partner Dashboard</title>
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0D1117" />
+<link rel="icon" type="image/png" href="assets/favicon.png" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+<style>
+  :root{
+    --bg:#0D1117; --elev:#161B2C; --border:#1E2640; --border-ghost:#1E264022;
+    --primary:#6C63FF; --primary-muted:#A78BFA; --primary-ghost-bg:#1A1535; --primary-ghost-border:#6C63FF55;
+    --red:#FF5C5C; --green:#00D4AA; --warning:#FFB547; --text:#FFFFFF; --text2:#8A94A6; --dim:#3A4258;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 0 48px}
+  .wrap{width:100%;max-width:560px;padding:0 4px}
+
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;margin-bottom:16px}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px}
+  .brandname{background:linear-gradient(135deg,#FFB547,#FF6B35);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  .logo{width:26px;height:26px}
+  /* Ghost button (DESIGN_SYSTEM §10) */
+  .ghostbtn{display:inline-flex;align-items:center;gap:3px;padding:6px 11px;border-radius:8px;
+    background:var(--primary-ghost-bg);border:1px solid var(--primary-ghost-border);color:var(--primary-muted);
+    font-size:12px;font-weight:600;cursor:pointer}
+
+  /* Hero greeting, balance-header style (§6) */
+  .hero{padding:6px 20px 4px}
+  .hero .eyebrow{color:var(--text2);font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+  .hero h1{font-size:26px;font-weight:800;letter-spacing:-.5px}
+
+  /* Flat section header (§14) */
+  .sectionHeader{padding:16px 20px 14px;border-top:1px solid var(--border);border-bottom:1px solid var(--border-ghost)}
+  .sectionTitle{color:var(--text2);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+
+  /* Funnel: flat numbers, no boxes */
+  .funnel{display:grid;grid-template-columns:repeat(2,1fr);padding:16px 12px 8px}
+  @media(min-width:480px){.funnel{grid-template-columns:repeat(4,1fr)}}
+  .stat{padding:8px 8px 14px}
+  .stat .val{font-size:28px;font-weight:800;letter-spacing:-.5px;line-height:1}
+  .stat .lbl{color:var(--text2);font-size:11px;font-weight:500;letter-spacing:.3px;margin-top:6px;text-transform:uppercase}
+
+  /* List rows (§7): flat, ghost separator */
+  .row{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--border-ghost)}
+  .row .cd{font-family:"JetBrains Mono",ui-monospace,monospace;font-weight:700;font-size:15px;letter-spacing:1px;color:var(--text)}
+  .row .meta{color:var(--text2);font-size:12px}
+  .row .reward{color:var(--green);font-size:12px;font-weight:700}
+  .row .grow{flex:1}
+  .row .who{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:14px;font-weight:600;color:var(--text)}
+  .row .when{color:var(--text2);font-size:12px}
+  /* Status as semantic colored text, no box (stays flat) */
+  .status{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+  .status.granted{color:var(--green)}
+  .status.eligible,.status.claimed{color:var(--warning)}
+  .status.pending{color:var(--text2)}
+  .status.expired{color:var(--red)}
+
+  /* Inline action button (§11) */
+  .inline{padding:6px 12px;border-radius:8px;background:var(--border);color:var(--text2);
+    border:none;font-size:12px;font-weight:600;cursor:pointer}
+  .inline:hover{color:var(--text)}
+  .inline.done{color:var(--green)}
+
+  /* Add/empty (§8,§9) */
+  .addrow{padding:14px 20px;color:var(--text2);font-size:14px}
+  .addrow.dim{color:var(--dim)}
+
+  .foot{color:var(--dim);font-size:12px;text-align:center;margin-top:20px}
+  .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:60px auto}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hidden{display:none}
+  .notice{padding:30px 20px;text-align:center}
+  .notice h2{font-size:20px;margin-bottom:8px}
+  .notice p{color:var(--text2);font-size:14px;line-height:1.6;margin-bottom:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="18" y1="10" x2="102" y2="110"><stop offset="0" stop-color="#FFB547"/><stop offset="1" stop-color="#FF6B35"/></linearGradient></defs>
+        <path d="M60,10 L102,35 L102,85 L60,110 L18,85 L18,35 Z" fill="none" stroke="url(#g)" stroke-width="6" stroke-linejoin="round"/>
+        <line x1="42" y1="82" x2="42" y2="62" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
+        <line x1="60" y1="82" x2="60" y2="48" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
+        <line x1="78" y1="82" x2="78" y2="32" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
+      </svg>
+      <span class="brandname">Babil</span>
+    </div>
+    <button class="ghostbtn hidden" id="signoutBtn">Sign out</button>
+  </div>
+
+  <div id="loading"><div class="spinner"></div></div>
+
+  <div id="denied" class="notice hidden">
+    <h2>Not a partner account</h2>
+    <p>This account isn't linked to a Babil partner profile. If you think this is a mistake, contact us.</p>
+    <button class="ghostbtn" id="denied-signout" style="margin:0 auto">Sign out</button>
+  </div>
+
+  <div id="dash" class="hidden">
+    <div class="hero">
+      <div class="eyebrow">Partner</div>
+      <h1 id="helloName">Welcome</h1>
+    </div>
+
+    <div class="sectionHeader"><span class="sectionTitle">Your funnel</span></div>
+    <div class="funnel">
+      <div class="stat"><div class="val" id="stClicks">0</div><div class="lbl">Link clicks</div></div>
+      <div class="stat"><div class="val" id="stSignups">0</div><div class="lbl">Signed up</div></div>
+      <div class="stat"><div class="val" id="stEligible">0</div><div class="lbl">Ready</div></div>
+      <div class="stat"><div class="val" style="color:var(--green)" id="stActive">0</div><div class="lbl">Activated</div></div>
+    </div>
+
+    <div class="sectionHeader"><span class="sectionTitle">Your codes</span></div>
+    <div id="codesList"></div>
+
+    <div class="sectionHeader"><span class="sectionTitle">Who you invited</span></div>
+    <div id="recruitsList"></div>
+  </div>
+
+  <p class="foot">Babil Partner Portal</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  var SUPABASE_URL = "https://nucsizdduvpojjtvayvn.supabase.co";
+  var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51Y3NpemRkdXZwb2pqdHZheXZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MTM4MDksImV4cCI6MjA5NDI4OTgwOX0.CSQLhokxnSC6E3BuXbeVil6kjg39QkI9ABF0fNgqQgg";
+  var LOGIN = "/partner-login";
+
+  var sb = window.supabase.createClient(SUPABASE_URL, ANON);
+
+  var $loading = document.getElementById('loading');
+  var $denied = document.getElementById('denied');
+  var $dash = document.getElementById('dash');
+  var $signout = document.getElementById('signoutBtn');
+
+  function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function fmtDate(s){ if(!s) return '…'; var d=new Date(s); if(isNaN(d)) return '…';
+    return d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}); }
+  function rewardLabel(type, months){
+    var plan = type === 'unlimited' ? 'Unlimited' : 'Premium';
+    var dur = (months && months > 1) ? (months + ' mo') : '1 mo';
+    return dur + ' ' + plan;
+  }
+  function statusLabel(s){
+    if(s==='granted') return 'Activated';
+    if(s==='eligible'||s==='claimed') return 'Ready';
+    if(s==='expired') return 'Expired';
+    return 'Pending';
+  }
+  function signOut(){ sb.auth.signOut().finally(function(){ location.replace(LOGIN); }); }
+  $signout.addEventListener('click', signOut);
+  document.getElementById('denied-signout').addEventListener('click', signOut);
+
+  function copyText(text, btn){
+    var t = btn.textContent;
+    var done = function(){ btn.textContent='Copied ✓'; btn.classList.add('done');
+      setTimeout(function(){ btn.textContent=t; btn.classList.remove('done'); }, 1800); };
+    try { navigator.clipboard.writeText(text).then(done, done); } catch(_){ done(); }
+  }
+
+  function renderCodes(codes){
+    var el = document.getElementById('codesList');
+    if(!codes.length){ el.innerHTML = '<div class="addrow dim">No codes yet. Contact us to set one up.</div>'; return; }
+    el.innerHTML = '';
+    codes.forEach(function(c){
+      var link = 'https://babilfinance.com/join/' + encodeURIComponent(c.code);
+      var div = document.createElement('div');
+      div.className = 'row';
+      div.innerHTML =
+        '<span class="cd">' + esc(c.code) + '</span>' +
+        (c.campaign ? '<span class="meta">· ' + esc(c.campaign) + '</span>' : '') +
+        '<span class="grow"></span>' +
+        '<span class="reward">' + esc(rewardLabel(c.reward_type, c.reward_duration_months)) + '</span>' +
+        '<button class="inline" data-copy="' + esc(c.code) + '">Copy code</button>' +
+        '<button class="inline" data-copy="' + esc(link) + '">Copy link</button>';
+      el.appendChild(div);
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-copy]'), function(b){
+      b.addEventListener('click', function(){ copyText(b.getAttribute('data-copy'), b); });
+    });
+  }
+
+  function renderRecruits(reds){
+    var el = document.getElementById('recruitsList');
+    if(!reds.length){ el.innerHTML = '<div class="addrow dim">No sign-ups yet. Share your link to get started.</div>'; return; }
+    reds.sort(function(a,b){ return new Date(b.redeemed_at) - new Date(a.redeemed_at); });
+    el.innerHTML = '';
+    reds.forEach(function(r){
+      var status = r.status || 'pending';
+      var when = status === 'granted' && r.granted_at ? 'Activated ' + fmtDate(r.granted_at) : 'Joined ' + fmtDate(r.redeemed_at);
+      // Privacy: no email/PII, short opaque handle only.
+      var handle = 'User ' + String(r.referred_user_id || '').slice(0,4).toUpperCase();
+      var div = document.createElement('div');
+      div.className = 'row';
+      div.innerHTML =
+        '<span class="who">' + esc(handle) + '</span>' +
+        '<span class="grow"></span>' +
+        '<span class="when">' + esc(when) + '</span>' +
+        '<span class="status ' + esc(status) + '">' + esc(statusLabel(status)) + '</span>';
+      el.appendChild(div);
+    });
+  }
+
+  function boot(){
+    sb.auth.getSession().then(function(res){
+      var session = res && res.data ? res.data.session : null;
+      if(!session){ location.replace(LOGIN); return; }
+      return loadDashboard();
+    }).catch(function(){ location.replace(LOGIN); });
+  }
+
+  function loadDashboard(){
+    return sb.from('partners').select('id, display_name, status').maybeSingle()
+      .then(function(p){
+        if(p.error || !p.data){ $loading.classList.add('hidden'); $denied.classList.remove('hidden'); return null; }
+        var partner = p.data;
+        document.getElementById('helloName').textContent = 'Hi, ' + (partner.display_name || 'Partner');
+        return Promise.all([
+          sb.from('referral_codes').select('code, campaign, reward_type, reward_duration_months, active'),
+          sb.from('referral_redemptions').select('status, redeemed_at, claimed_at, granted_at, referred_user_id'),
+          sb.from('partner_link_clicks').select('id', { count: 'exact', head: true })
+        ]).then(function(out){
+          var codes = (out[0].data) || [];
+          var reds = (out[1].data) || [];
+          var clicks = (out[2].count) || 0;
+
+          var eligible = reds.filter(function(r){ return r.status==='eligible' || r.status==='claimed'; }).length;
+          var active = reds.filter(function(r){ return r.status==='granted'; }).length;
+
+          document.getElementById('stClicks').textContent = clicks;
+          document.getElementById('stSignups').textContent = reds.length;
+          document.getElementById('stEligible').textContent = eligible;
+          document.getElementById('stActive').textContent = active;
+
+          renderCodes(codes);
+          renderRecruits(reds);
+
+          $loading.classList.add('hidden');
+          $signout.classList.remove('hidden');
+          $dash.classList.remove('hidden');
+        });
+      });
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>

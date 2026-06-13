@@ -4,3 +4,5 @@ node_modules/
 .vercel/
 .claude/
 scripts/
+# Ecosystem pointer — local only; babil-site is a PUBLIC repo, keep internal infra refs out.
+CLAUDE.md
