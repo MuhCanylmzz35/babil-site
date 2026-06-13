@@ -18,7 +18,7 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     min-height:100vh;padding:28px 0 64px}
-  .wrap{width:100%;max-width:560px;margin:0 auto;padding:0 4px}
+  .wrap{width:100%;max-width:620px;margin:0 auto;padding:0 4px}
   .brandrow{display:flex;align-items:center;justify-content:space-between;padding:0 20px;margin-bottom:6px}
   .brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px}
   .brandname{background:linear-gradient(135deg,#FFB547,#FF6B35);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
@@ -34,10 +34,16 @@
   .lead{color:var(--text2);font-size:14.5px;line-height:1.6;margin-bottom:18px}
   form{display:flex;flex-direction:column;gap:14px}
   label{font-size:11px;font-weight:600;letter-spacing:.8px;color:var(--text2);text-transform:uppercase}
-  input{width:100%;background:transparent;border:1px solid var(--border);border-radius:14px;
-    color:var(--text);font-size:16px;padding:14px;outline:none;transition:border-color .15s}
-  input:focus{border-color:var(--primary)}
+  input,select{width:100%;background:transparent;border:1px solid var(--border);border-radius:14px;
+    color:var(--text);font-size:16px;padding:14px;outline:none;transition:border-color .15s;appearance:none}
+  input:focus,select:focus{border-color:var(--primary)}
   input::placeholder{color:var(--dim)}
+  select option{background:var(--elev);color:var(--text)}
+  .field{display:flex;flex-direction:column;gap:7px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .checkrow{display:flex;align-items:center;gap:10px}
+  .checkrow input{width:18px;height:18px;flex:0 0 auto}
+  .checkrow span{font-size:13px;color:var(--text2)}
   .hint{color:var(--dim);font-size:12px;line-height:1.5}
   .btn{position:relative;width:100%;background:var(--primary);color:#fff;border:none;text-align:center;
     font-size:14px;font-weight:700;padding:14px;border-radius:22px;cursor:pointer;transition:opacity .15s}
@@ -49,26 +55,42 @@
   .ghost{background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:22px;
     font-size:13px;font-weight:600;padding:9px 16px;cursor:pointer}
   .ghost:hover{color:var(--text);border-color:var(--dim)}
+  .link{background:none;border:none;color:var(--primary-muted);font-size:13px;font-weight:600;cursor:pointer;padding:0}
   .inline{background:transparent;color:var(--primary-muted);border:1px solid var(--border);border-radius:12px;
     font-size:12px;font-weight:600;padding:7px 12px;cursor:pointer;white-space:nowrap}
   .inline:hover{border-color:var(--primary)}
   .msg{font-size:13px;line-height:1.5}
   .msg.err{color:var(--red)}
+  .msg.ok{color:var(--green)}
   .hidden{display:none}
+
+  .tabs{display:flex;gap:8px;padding:14px 20px 0}
+  .tab{background:transparent;border:none;color:var(--text2);font-size:14px;font-weight:700;
+    padding:8px 4px;cursor:pointer;border-bottom:2px solid transparent}
+  .tab[data-active="true"]{color:var(--text);border-bottom-color:var(--primary)}
 
   .linkbox{margin-top:4px;border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
   .linkbox .url{font-size:13px;color:var(--primary-muted);word-break:break-all;line-height:1.5}
   .linkbox .meta{color:var(--dim);font-size:12px}
 
   .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border-ghost)}
+  .row.click{cursor:pointer}
+  .row.click:hover{background:var(--border-ghost)}
   .row .left{min-width:0}
   .row .note{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .row .sub{color:var(--text2);font-size:12px;margin-top:2px}
   .status{font-size:12px;font-weight:700}
   .status.pending{color:var(--text2)}
-  .status.claimed{color:var(--green)}
+  .status.eligible{color:var(--warning)}
+  .status.claimed{color:var(--warning)}
+  .status.granted{color:var(--green)}
   .status.expired{color:var(--red)}
   .empty{padding:16px 20px;color:var(--dim);font-size:13px}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border-ghost);margin:0 20px;border-radius:12px;overflow:hidden}
+  .stat{background:var(--bg);padding:12px 10px;text-align:center}
+  .stat .n{font-size:18px;font-weight:800}
+  .stat .l{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
 
   .foot{color:var(--dim);font-size:12px;text-align:center;margin-top:22px}
   .foot a{color:var(--text2);text-decoration:none}
@@ -90,54 +112,144 @@
     <span class="eyebrow">Partner Admin</span>
   </div>
 
-  <!-- Login -->
-  <div id="loginSection" class="hidden">
-    <div class="sectionHeader first"><span class="sectionTitle">Admin sign in</span></div>
+  <!-- Auth (sign in / create account) -->
+  <div id="authSection" class="hidden">
+    <div class="sectionHeader first"><span class="sectionTitle" id="authTitle">Admin sign in</span></div>
     <div class="body">
-      <h1>Admin sign-in</h1>
-      <p class="lead">Enter your admin email. We send a secure sign-in link, no password needed.</p>
-      <form id="loginForm" novalidate>
-        <label for="loginEmail">Email address</label>
-        <input id="loginEmail" type="email" inputmode="email" autocomplete="email"
-               placeholder="you@example.com" autocapitalize="off" spellcheck="false" />
-        <button id="loginBtn" class="btn" type="submit">Send sign-in link</button>
-        <div id="loginMsg" class="msg" role="status" aria-live="polite"></div>
+      <h1 id="authHeading">Admin sign-in</h1>
+      <p class="lead" id="authLead">Sign in with your admin email and password.</p>
+      <form id="authForm" novalidate>
+        <div class="field">
+          <label for="email">Email address</label>
+          <input id="email" type="email" inputmode="email" autocomplete="email"
+                 placeholder="you@example.com" autocapitalize="off" spellcheck="false" />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
+        </div>
+        <button id="authBtn" class="btn" type="submit">Sign in</button>
+        <div id="authMsg" class="msg" role="status" aria-live="polite"></div>
+        <div style="text-align:center">
+          <button id="toggleMode" class="link" type="button">Create an admin account</button>
+        </div>
       </form>
     </div>
-  </div>
-
-  <div id="sentSection" class="body hidden">
-    <h1>Check your email</h1>
-    <p class="lead">If <span id="sentEmail" style="color:var(--primary-muted);font-weight:600"></span> is an admin, a sign-in link is on its way. Open it on this device.</p>
   </div>
 
   <!-- Admin home -->
   <div id="adminSection" class="hidden">
     <div class="sectionHeader first">
-      <span class="sectionTitle">New invite</span>
+      <span class="sectionTitle">Control portal</span>
       <button id="signOut" class="ghost" type="button">Sign out</button>
     </div>
-    <div class="body">
-      <p class="lead">Create a single-use link for a partner. They open it, set their email, name, and code, and get their dashboard. The link expires in 14 days.</p>
-      <form id="inviteForm" novalidate>
-        <label for="note">Label (optional)</label>
-        <input id="note" type="text" placeholder="e.g. Merve, W&amp;T 2026" maxlength="120" />
-        <span class="hint">Only you see this, to tell links apart.</span>
-        <button id="inviteBtn" class="btn" type="submit">Create invite link</button>
-        <div id="inviteMsg" class="msg" role="status" aria-live="polite"></div>
-      </form>
+    <div id="adminBanner" class="body hidden"><div class="msg err"></div></div>
 
-      <div id="resultBox" class="linkbox hidden">
-        <div id="resultUrl" class="url"></div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button id="copyBtn" class="inline" type="button">Copy link</button>
-          <span id="copyMsg" class="meta"></span>
-        </div>
-      </div>
+    <div class="tabs">
+      <button class="tab" data-tab="invites" data-active="true">Invites</button>
+      <button class="tab" data-tab="partners" data-active="false">Partners</button>
     </div>
 
-    <div class="sectionHeader"><span class="sectionTitle">Recent invites</span></div>
-    <div id="invitesList"><div class="empty">Loading…</div></div>
+    <!-- Invites tab -->
+    <div id="invitesTab">
+      <div class="body">
+        <p class="lead">Create a single-use link for a partner. They open it, set their email, name, password, and code. The link expires in 14 days. The reward settings below are locked into that partner's code.</p>
+        <form id="inviteForm" novalidate>
+          <div class="field">
+            <label for="note">Label (optional)</label>
+            <input id="note" type="text" placeholder="e.g. Merve, W&amp;T 2026" maxlength="120" />
+            <span class="hint">Only you see this, to tell links apart.</span>
+          </div>
+          <div class="field">
+            <label for="campaign">Campaign (optional)</label>
+            <input id="campaign" type="text" placeholder="e.g. W&amp;T 2026" maxlength="80" />
+          </div>
+
+          <div class="grid2">
+            <div class="field">
+              <label for="rewardType">Referred user reward</label>
+              <select id="rewardType">
+                <option value="premium">Premium</option>
+                <option value="unlimited">Unlimited</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="rewardMonths">Reward months</label>
+              <input id="rewardMonths" type="number" min="1" max="12" value="1" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="activationMode">Activation</label>
+            <select id="activationMode">
+              <option value="deferred">Deferred (user activates when ready)</option>
+              <option value="instant">Instant (auto on onboarding completion)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Partner reward</label>
+            <div class="checkrow">
+              <input id="partnerEnabled" type="checkbox" checked />
+              <span>Give the partner a free reward for each activation</span>
+            </div>
+          </div>
+          <div class="grid2" id="partnerRewardRow">
+            <div class="field">
+              <label for="partnerRewardType">Partner reward type</label>
+              <select id="partnerRewardType">
+                <option value="">Same as referred</option>
+                <option value="premium">Premium</option>
+                <option value="unlimited">Unlimited</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="partnerRewardMonths">Partner months</label>
+              <input id="partnerRewardMonths" type="number" min="1" max="12" placeholder="Same" />
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="field">
+              <label for="codeValidMonths">Code valid (months)</label>
+              <input id="codeValidMonths" type="number" min="1" max="36" value="18" />
+            </div>
+            <div class="field">
+              <label for="monthlyCap">Monthly cap</label>
+              <input id="monthlyCap" type="number" min="0" max="1000" value="50" />
+            </div>
+          </div>
+
+          <button id="inviteBtn" class="btn" type="submit">Create invite link</button>
+          <div id="inviteMsg" class="msg" role="status" aria-live="polite"></div>
+        </form>
+
+        <div id="resultBox" class="linkbox hidden">
+          <div id="resultUrl" class="url"></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button id="copyBtn" class="inline" type="button">Copy link</button>
+            <span id="copyMsg" class="meta"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sectionHeader"><span class="sectionTitle">Recent invites</span></div>
+      <div id="invitesList"><div class="empty">Loading…</div></div>
+    </div>
+
+    <!-- Partners tab -->
+    <div id="partnersTab" class="hidden">
+      <div id="partnerDetail" class="hidden">
+        <div class="sectionHeader">
+          <span class="sectionTitle" id="detailName">Partner</span>
+          <button id="backToPartners" class="link" type="button">&larr; All partners</button>
+        </div>
+        <div class="stats" id="detailStats"></div>
+        <div class="sectionHeader"><span class="sectionTitle">Recent activity</span></div>
+        <div id="detailActivity"><div class="empty">Loading…</div></div>
+      </div>
+      <div id="partnersList"><div class="empty">Loading…</div></div>
+    </div>
   </div>
 
   <p class="foot"><a href="/">&larr; babilfinance.com</a></p>
@@ -153,66 +265,135 @@
 
   var sb = window.supabase.createClient(SUPABASE_URL, ANON);
 
-  var loginSection = document.getElementById("loginSection");
-  var sentSection = document.getElementById("sentSection");
-  var adminSection = document.getElementById("adminSection");
-  var loginForm = document.getElementById("loginForm");
-  var loginEmail = document.getElementById("loginEmail");
-  var loginBtn = document.getElementById("loginBtn");
-  var loginMsg = document.getElementById("loginMsg");
-  var sentEmail = document.getElementById("sentEmail");
-  var inviteForm = document.getElementById("inviteForm");
-  var noteIn = document.getElementById("note");
-  var inviteBtn = document.getElementById("inviteBtn");
-  var inviteMsg = document.getElementById("inviteMsg");
-  var resultBox = document.getElementById("resultBox");
-  var resultUrl = document.getElementById("resultUrl");
-  var copyBtn = document.getElementById("copyBtn");
-  var copyMsg = document.getElementById("copyMsg");
-  var invitesList = document.getElementById("invitesList");
-  var signOut = document.getElementById("signOut");
+  var $ = function(id){ return document.getElementById(id); };
+  var authSection = $("authSection"), adminSection = $("adminSection");
+  var authForm = $("authForm"), emailIn = $("email"), passIn = $("password");
+  var authBtn = $("authBtn"), authMsg = $("authMsg"), toggleMode = $("toggleMode");
+  var authHeading = $("authHeading"), authLead = $("authLead"), authTitle = $("authTitle");
+  var adminBanner = $("adminBanner");
+  var mode = "signin"; // or "signup"
+  var partnersLoaded = false;
 
-  function show(view){
-    [loginSection, sentSection, adminSection].forEach(function(v){ v.classList.add("hidden"); });
-    view.classList.remove("hidden");
-  }
+  function showAuth(){ authSection.classList.remove("hidden"); adminSection.classList.add("hidden"); }
+  function setAuthMsg(t, kind){ authMsg.textContent=t||""; authMsg.className="msg"+(kind?(" "+kind):""); }
 
   // Route on session.
   sb.auth.getSession().then(function(res){
-    if(res && res.data && res.data.session){ enterAdmin(); }
-    else { show(loginSection); }
+    if(res && res.data && res.data.session){ enterAdmin(); } else { showAuth(); }
   });
 
-  // ---- Login ----
-  loginEmail && loginEmail.addEventListener("input", function(){ loginMsg.textContent=""; loginMsg.classList.remove("err"); });
-  loginForm && loginForm.addEventListener("submit", function(e){
+  // ---- Auth ----
+  toggleMode.addEventListener("click", function(){
+    mode = mode === "signin" ? "signup" : "signin";
+    setAuthMsg("");
+    if(mode === "signup"){
+      authTitle.textContent = "Create admin account";
+      authHeading.textContent = "Create your account";
+      authLead.textContent = "Use your admin email. Only allow-listed emails can manage partners.";
+      authBtn.textContent = "Create account";
+      passIn.setAttribute("autocomplete","new-password");
+      toggleMode.textContent = "I already have an account";
+    } else {
+      authTitle.textContent = "Admin sign in";
+      authHeading.textContent = "Admin sign-in";
+      authLead.textContent = "Sign in with your admin email and password.";
+      authBtn.textContent = "Sign in";
+      passIn.setAttribute("autocomplete","current-password");
+      toggleMode.textContent = "Create an admin account";
+    }
+  });
+
+  [emailIn, passIn].forEach(function(el){ el.addEventListener("input", function(){ setAuthMsg(""); }); });
+
+  authForm.addEventListener("submit", function(e){
     e.preventDefault();
-    loginMsg.textContent=""; loginMsg.classList.remove("err");
-    var email = (loginEmail.value||"").trim().toLowerCase();
-    if(!EMAIL_RE.test(email)){ loginMsg.textContent="Please enter a valid email address."; loginMsg.classList.add("err"); return; }
-    loginBtn.disabled = true; loginBtn.innerHTML = '<span class="spin"></span>Sending…';
-    sb.auth.signInWithOtp({ email: email, options:{ shouldCreateUser:false, emailRedirectTo: REDIRECT } })
-      .then(function(){ sentEmail.textContent = email; show(sentSection); })
-      .catch(function(){ loginBtn.disabled=false; loginBtn.textContent="Send sign-in link"; loginMsg.textContent="Network error. Please try again."; loginMsg.classList.add("err"); });
+    setAuthMsg("");
+    var email = (emailIn.value||"").trim().toLowerCase();
+    var pass = passIn.value||"";
+    if(!EMAIL_RE.test(email)){ setAuthMsg("Please enter a valid email address.","err"); return; }
+    if(pass.length < 8){ setAuthMsg("Password must be at least 8 characters.","err"); return; }
+    authBtn.disabled = true; authBtn.innerHTML = '<span class="spin"></span>'+(mode==="signup"?"Creating…":"Signing in…");
+
+    if(mode === "signup"){
+      sb.auth.signUp({ email: email, password: pass, options:{ emailRedirectTo: REDIRECT } })
+        .then(function(res){
+          authBtn.disabled=false; authBtn.textContent="Create account";
+          if(res.error){ setAuthMsg(res.error.message || "Could not create account.","err"); return; }
+          if(res.data && res.data.session){ enterAdmin(); return; }
+          setAuthMsg("Account created. Check your email to confirm, then sign in.","ok");
+          mode = "signin"; toggleMode.click(); toggleMode.click();
+        })
+        .catch(function(){ authBtn.disabled=false; authBtn.textContent="Create account"; setAuthMsg("Network error. Please try again.","err"); });
+    } else {
+      sb.auth.signInWithPassword({ email: email, password: pass })
+        .then(function(res){
+          authBtn.disabled=false; authBtn.textContent="Sign in";
+          if(res.error){ setAuthMsg("Wrong email or password.","err"); return; }
+          enterAdmin();
+        })
+        .catch(function(){ authBtn.disabled=false; authBtn.textContent="Sign in"; setAuthMsg("Network error. Please try again.","err"); });
+    }
   });
 
-  signOut && signOut.addEventListener("click", function(){
-    sb.auth.signOut().then(function(){ location.reload(); });
-  });
+  $("signOut").addEventListener("click", function(){ sb.auth.signOut().then(function(){ location.reload(); }); });
 
   // ---- Admin home ----
   function enterAdmin(){
-    show(adminSection);
+    authSection.classList.add("hidden");
+    adminSection.classList.remove("hidden");
+    switchTab("invites");
     loadInvites();
   }
 
-  inviteForm && inviteForm.addEventListener("submit", function(e){
+  function showBanner(text){
+    adminBanner.classList.remove("hidden");
+    adminBanner.querySelector(".msg").textContent = text;
+  }
+
+  // Tabs
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.addEventListener("click", function(){ switchTab(t.getAttribute("data-tab")); });
+  });
+  function switchTab(name){
+    document.querySelectorAll(".tab").forEach(function(t){
+      t.setAttribute("data-active", String(t.getAttribute("data-tab") === name));
+    });
+    $("invitesTab").classList.toggle("hidden", name !== "invites");
+    $("partnersTab").classList.toggle("hidden", name !== "partners");
+    if(name === "partners" && !partnersLoaded){ partnersLoaded = true; loadPartners(); }
+  }
+
+  // ---- Invite creation ----
+  var inviteForm = $("inviteForm"), inviteBtn = $("inviteBtn"), inviteMsg = $("inviteMsg");
+  var resultBox = $("resultBox"), resultUrl = $("resultUrl"), copyBtn = $("copyBtn"), copyMsg = $("copyMsg");
+
+  $("partnerEnabled").addEventListener("change", function(){
+    $("partnerRewardRow").style.opacity = this.checked ? "1" : "0.4";
+  });
+
+  inviteForm.addEventListener("submit", function(e){
     e.preventDefault();
-    inviteMsg.textContent=""; inviteMsg.classList.remove("err");
-    resultBox.classList.add("hidden");
+    inviteMsg.textContent=""; inviteMsg.className="msg"; resultBox.classList.add("hidden");
     inviteBtn.disabled = true; inviteBtn.innerHTML = '<span class="spin"></span>Creating…';
 
-    sb.functions.invoke("create-partner-invite", { body: { note: (noteIn.value||"").trim() } })
+    var partnerEnabled = $("partnerEnabled").checked;
+    var prType = $("partnerRewardType").value || null;
+    var prMonths = $("partnerRewardMonths").value ? Number($("partnerRewardMonths").value) : null;
+
+    var body = {
+      note: ($("note").value||"").trim(),
+      campaign: ($("campaign").value||"").trim() || null,
+      reward_type: $("rewardType").value,
+      reward_duration_months: Number($("rewardMonths").value) || 1,
+      activation_mode: $("activationMode").value,
+      partner_reward_enabled: partnerEnabled,
+      partner_reward_type: partnerEnabled ? prType : null,
+      partner_reward_duration_months: partnerEnabled ? prMonths : null,
+      code_valid_months: Number($("codeValidMonths").value) || 18,
+      monthly_cap: $("monthlyCap").value === "" ? 50 : Number($("monthlyCap").value),
+    };
+
+    sb.functions.invoke("create-partner-invite", { body: body })
       .then(function(res){
         inviteBtn.disabled=false; inviteBtn.textContent="Create invite link";
         var data = res && res.data;
@@ -221,11 +402,8 @@
           inviteMsg.textContent = reason==="not_admin" ? "This account is not an admin." : "Could not create the link. Please try again.";
           inviteMsg.classList.add("err"); return;
         }
-        var url = location.origin + "/partner-join?token=" + data.token;
-        resultUrl.textContent = url;
-        copyMsg.textContent = "";
-        resultBox.classList.remove("hidden");
-        noteIn.value = "";
+        resultUrl.textContent = location.origin + "/partner-join?token=" + data.token;
+        copyMsg.textContent = ""; resultBox.classList.remove("hidden");
         loadInvites();
       })
       .catch(function(){
@@ -234,74 +412,109 @@
       });
   });
 
-  copyBtn && copyBtn.addEventListener("click", function(){
-    var text = resultUrl.textContent;
-    function done(){ copyMsg.textContent = "Copied."; setTimeout(function(){ copyMsg.textContent=""; }, 2000); }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(done).catch(fallback);
-    } else { fallback(); }
-    function fallback(){
-      var ta = document.createElement("textarea");
-      ta.value = text; ta.style.position="fixed"; ta.style.opacity="0";
-      document.body.appendChild(ta); ta.select();
-      try{ document.execCommand("copy"); done(); }catch(_){ copyMsg.textContent="Copy failed."; }
-      document.body.removeChild(ta);
-    }
-  });
+  copyBtn.addEventListener("click", function(){ copyText(resultUrl.textContent, function(){ copyMsg.textContent="Copied."; setTimeout(function(){ copyMsg.textContent=""; },2000); }); });
 
-  function fmtDate(s){
-    try{ return new Date(s).toLocaleDateString(undefined, { month:"short", day:"numeric" }); }
-    catch(_){ return ""; }
+  function copyText(text, done){
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done).catch(fallback); }
+    else { fallback(); }
+    function fallback(){
+      var ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+      document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); done(); }catch(_){ } document.body.removeChild(ta);
+    }
+  }
+
+  function fmtDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:"short",day:"numeric"}); }catch(_){ return ""; } }
+  function esc(s){ var d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
+  function rewardLabel(type, months, mode){
+    var t = type==="unlimited" ? "Unlimited" : "Premium";
+    var m = (months||1) + (months===1?"mo":"mo");
+    return t + " · " + m + (mode==="instant" ? " · instant" : "");
   }
 
   function loadInvites(){
     sb.rpc("admin_list_invites").then(function(res){
-      if(res.error || !res.data || !res.data.length){
-        invitesList.innerHTML = '<div class="empty">No invites yet.</div>';
-        return;
+      if(res.error){
+        if((res.error.message||"").indexOf("not_admin")!==-1){ showBanner("This account is not an admin. Ask an existing admin to add your email."); }
+        $("invitesList").innerHTML = '<div class="empty">Could not load invites.</div>'; return;
       }
+      adminBanner.classList.add("hidden");
+      var data = res.data || [];
+      if(!data.length){ $("invitesList").innerHTML = '<div class="empty">No invites yet.</div>'; return; }
       var html = "";
-      res.data.forEach(function(it){
+      data.forEach(function(it){
         var st = it.status;
-        var sub = st === "claimed"
-          ? ("Claimed " + fmtDate(it.claimed_at))
-          : st === "expired"
-          ? ("Expired " + fmtDate(it.expires_at))
-          : ("Expires " + fmtDate(it.expires_at));
-        var label = (it.note && it.note.length) ? it.note : "Invite";
-        var canCopy = st === "pending";
+        var sub = st==="claimed" ? ("Claimed "+fmtDate(it.claimed_at)) : st==="expired" ? ("Expired "+fmtDate(it.expires_at)) : ("Expires "+fmtDate(it.expires_at));
+        var reward = it.reward_type ? rewardLabel(it.reward_type, it.reward_duration_months, it.activation_mode) : "";
         html += '<div class="row"><div class="left">'
-          + '<div class="note"></div>'
-          + '<div class="sub">' + sub + '</div></div>'
+          + '<div class="note">'+esc(it.note && it.note.length ? it.note : "Invite")+'</div>'
+          + '<div class="sub">'+sub+(reward?(' · '+reward):'')+'</div></div>'
           + '<div style="display:flex;align-items:center;gap:10px">'
-          + (canCopy ? '<button class="inline" data-token="' + it.token + '">Copy link</button>' : '')
-          + '<span class="status ' + st + '">' + st + '</span>'
-          + '</div></div>';
+          + (st==="pending" ? '<button class="inline" data-token="'+esc(it.token)+'">Copy link</button>' : '')
+          + '<span class="status '+st+'">'+st+'</span></div></div>';
       });
-      invitesList.innerHTML = html;
-      // Fill note text safely (avoid HTML injection from the label).
-      var rows = invitesList.querySelectorAll(".row");
-      rows.forEach(function(row, i){
-        var it = res.data[i];
-        var noteEl = row.querySelector(".note");
-        if(noteEl) noteEl.textContent = (it.note && it.note.length) ? it.note : "Invite";
-      });
-      // Wire per-row copy buttons.
-      invitesList.querySelectorAll(".inline[data-token]").forEach(function(b){
+      $("invitesList").innerHTML = html;
+      $("invitesList").querySelectorAll(".inline[data-token]").forEach(function(b){
         b.addEventListener("click", function(){
           var url = location.origin + "/partner-join?token=" + b.getAttribute("data-token");
-          function ok(){ b.textContent="Copied"; setTimeout(function(){ b.textContent="Copy link"; },1500); }
-          if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(ok).catch(function(){}); }
-          else {
-            var ta=document.createElement("textarea"); ta.value=url; ta.style.position="fixed"; ta.style.opacity="0";
-            document.body.appendChild(ta); ta.select(); try{document.execCommand("copy"); ok();}catch(_){ } document.body.removeChild(ta);
-          }
+          copyText(url, function(){ b.textContent="Copied"; setTimeout(function(){ b.textContent="Copy link"; },1500); });
         });
       });
-    }).catch(function(){
-      invitesList.innerHTML = '<div class="empty">Could not load invites.</div>';
-    });
+    }).catch(function(){ $("invitesList").innerHTML = '<div class="empty">Could not load invites.</div>'; });
   }
+
+  // ---- Partners ----
+  function loadPartners(){
+    sb.rpc("admin_list_partners").then(function(res){
+      if(res.error){
+        if((res.error.message||"").indexOf("not_admin")!==-1){ showBanner("This account is not an admin."); }
+        $("partnersList").innerHTML = '<div class="empty">Could not load partners.</div>'; return;
+      }
+      var data = res.data || [];
+      if(!data.length){ $("partnersList").innerHTML = '<div class="empty">No partners yet.</div>'; return; }
+      var html = "";
+      data.forEach(function(p){
+        var reward = p.reward_type ? rewardLabel(p.reward_type, p.reward_duration_months, p.activation_mode) : "No code yet";
+        html += '<div class="row click" data-pid="'+esc(p.partner_id)+'" data-name="'+esc(p.display_name)+'"><div class="left">'
+          + '<div class="note">'+esc(p.display_name)+(p.code?(' · '+esc(p.code)):'')+'</div>'
+          + '<div class="sub">'+reward+' · '+p.granted+' activated / '+p.signups+' signups · '+p.clicks+' clicks</div></div>'
+          + '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#8A94A6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+      });
+      $("partnersList").innerHTML = html;
+      $("partnersList").querySelectorAll(".row.click").forEach(function(r){
+        r.addEventListener("click", function(){ openPartner(r.getAttribute("data-pid"), r.getAttribute("data-name")); });
+      });
+    }).catch(function(){ $("partnersList").innerHTML = '<div class="empty">Could not load partners.</div>'; });
+  }
+
+  $("backToPartners").addEventListener("click", function(){
+    $("partnerDetail").classList.add("hidden"); $("partnersList").classList.remove("hidden");
+  });
+
+  function openPartner(pid, name){
+    $("detailName").textContent = name || "Partner";
+    $("partnersList").classList.add("hidden");
+    $("partnerDetail").classList.remove("hidden");
+    $("detailActivity").innerHTML = '<div class="empty">Loading…</div>';
+    $("detailStats").innerHTML = "";
+    sb.rpc("admin_partner_detail", { p_partner_id: pid }).then(function(res){
+      var data = (res && res.data) || [];
+      var counts = { pending:0, eligible:0, claimed:0, granted:0, expired:0 };
+      data.forEach(function(r){ if(counts[r.status]!=null) counts[r.status]++; });
+      $("detailStats").innerHTML =
+        statCell(data.length, "Total") + statCell(counts.eligible+counts.pending, "Pending") +
+        statCell(counts.granted, "Granted") + statCell(counts.expired, "Expired");
+      if(!data.length){ $("detailActivity").innerHTML = '<div class="empty">No redemptions yet.</div>'; return; }
+      var html = "";
+      data.forEach(function(r){
+        html += '<div class="row"><div class="left">'
+          + '<div class="note">User '+esc(r.referred_short)+'</div>'
+          + '<div class="sub">'+(r.activation_mode==="instant"?"Instant · ":"")+"Redeemed "+fmtDate(r.redeemed_at)+(r.granted_at?(" · Granted "+fmtDate(r.granted_at)):"")+'</div></div>'
+          + '<span class="status '+r.status+'">'+r.status+'</span></div>';
+      });
+      $("detailActivity").innerHTML = html;
+    }).catch(function(){ $("detailActivity").innerHTML = '<div class="empty">Could not load activity.</div>'; });
+  }
+  function statCell(n, l){ return '<div class="stat"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>'; }
 })();
 </script>
 </body>

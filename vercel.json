@@ -8,6 +8,7 @@
   "rewrites": [
     { "source": "/work-summary/:id", "destination": "/work-summary" },
     { "source": "/join/:code", "destination": "/join" },
-    { "source": "/partner", "destination": "/partner-login" }
+    { "source": "/partner", "destination": "/partner-login" },
+    { "source": "/admin", "destination": "/partner-admin" }
   ]
 }

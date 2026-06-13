@@ -107,7 +107,13 @@
         <label for="email">Email address</label>
         <input id="email" name="email" type="email" inputmode="email" autocomplete="email"
                placeholder="you@example.com" autocapitalize="off" spellcheck="false" />
-        <span class="hint">You will sign in with this email. No password needed.</span>
+        <span class="hint">You will sign in with this email and the password you set below.</span>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="new-password"
+               placeholder="At least 8 characters" />
+        <span class="hint">You'll use this to sign in to your dashboard later.</span>
       </div>
       <div class="field">
         <label for="name">Display name</label>
@@ -133,7 +139,8 @@
       </svg>
     </div>
     <h2>Profile created</h2>
-    <p>Your code <span id="okCode" class="em"></span> is live. We sent a sign-in link to <span id="okEmail" class="em"></span>. Open it on this device to enter your dashboard.</p>
+    <p>Your code <span id="okCode" class="em"></span> is live. Sign in with <span id="okEmail" class="em"></span> and your password to open your dashboard.</p>
+    <p style="margin-top:14px"><a href="/partner-login" style="color:var(--primary-muted);font-weight:600;text-decoration:none">Go to sign-in &rarr;</a></p>
   </div>
 
   <p class="foot"><a href="/">&larr; babilfinance.com</a></p>
@@ -158,6 +165,7 @@
   var successView = document.getElementById("successView");
   var form = document.getElementById("joinForm");
   var emailIn = document.getElementById("email");
+  var passIn = document.getElementById("password");
   var nameIn = document.getElementById("name");
   var codeIn = document.getElementById("code");
   var btn = document.getElementById("submitBtn");
@@ -205,22 +213,24 @@
     }).catch(function(){ showInvalid("invalid"); });
   }
 
-  [emailIn, nameIn, codeIn].forEach(function(el){ el.addEventListener("input", clearError); });
+  [emailIn, passIn, nameIn, codeIn].forEach(function(el){ el.addEventListener("input", clearError); });
 
   form.addEventListener("submit", function(e){
     e.preventDefault();
     clearError();
     var email = (emailIn.value || "").trim().toLowerCase();
+    var pass = passIn.value || "";
     var name = (nameIn.value || "").trim();
     var code = (codeIn.value || "").trim().toUpperCase();
 
     if(!EMAIL_RE.test(email)){ showError("Please enter a valid email address."); return; }
+    if(pass.length < 8){ showError("Password must be at least 8 characters."); return; }
     if(name.length < 2){ showError("Please enter your display name."); return; }
     if(!CODE_RE.test(code)){ showError("Code must be 3 to 20 letters and numbers, no spaces."); return; }
     setLoading(true);
 
     sb.functions.invoke("claim-partner-invite", {
-      body: { token: TOKEN, email: email, display_name: name, code: code }
+      body: { token: TOKEN, email: email, password: pass, display_name: name, code: code }
     }).then(function(res){
       var data = res && res.data;
       if(res.error || !data || !data.ok){
@@ -229,24 +239,20 @@
         if(reason === "code_taken"){ showError("That code is already taken. Please try another."); return; }
         if(reason === "email_in_use"){ showError("That email is already registered. Try signing in instead."); return; }
         if(reason === "invalid_code"){ showError("That code is not allowed. Use 3 to 20 letters and numbers."); return; }
+        if(reason === "invalid_password"){ showError("Password must be 8 to 72 characters."); return; }
         if(reason === "token_used" || reason === "invalid_token"){ showInvalid("claimed"); return; }
         if(reason === "token_expired"){ showInvalid("expired"); return; }
         showError("Something went wrong. Please try again in a moment.");
         return;
       }
-      // Send the login link so the partner can reach the dashboard.
-      sb.auth.signInWithOtp({
-        email: email,
-        options: { shouldCreateUser: false, emailRedirectTo: REDIRECT }
-      }).then(function(){
-        okCode.textContent = code;
-        okEmail.textContent = email;
-        show(successView);
+      // Sign the partner in with the password they just set, then go to
+      // the dashboard. If sign-in hiccups, the success screen guides them
+      // to the sign-in page (their account already exists).
+      sb.auth.signInWithPassword({ email: email, password: pass }).then(function(r2){
+        if(r2 && !r2.error && r2.data && r2.data.session){ location.replace(REDIRECT); return; }
+        okCode.textContent = code; okEmail.textContent = email; show(successView);
       }).catch(function(){
-        // Profile is created; just guide them to sign in manually.
-        okCode.textContent = code;
-        okEmail.textContent = email;
-        show(successView);
+        okCode.textContent = code; okEmail.textContent = email; show(successView);
       });
     }).catch(function(){
       setLoading(false);

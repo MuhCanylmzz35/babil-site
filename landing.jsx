@@ -2,13 +2,23 @@
 
 function Nav({ page, setPage, variant, setVariant }) {
   const [featOpen, setFeatOpen] = React.useState(false);
+  const [appOpen, setAppOpen] = React.useState(false);
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const closeTimer = React.useRef(null);
+  const appCloseTimer = React.useRef(null);
 
   const links = [
     { k: "home", l: "Home" },
     { k: "pricing", l: "Pricing", anchor: true },
     { k: "contact", l: "Support", anchor: true },
+  ];
+
+  // USE APP entry points. Admin = control portal, Partner = partner
+  // dashboard sign-in, User = end-user area (not built yet).
+  const appItems = [
+    { k: "admin",   label: "Admin",   desc: "Manage partners & invites", href: "/admin" },
+    { k: "partner", label: "Partner", desc: "Sign in to your dashboard",  href: "/partner" },
+    { k: "user",    label: "User",    desc: "Coming soon",                href: null },
   ];
 
   const featItems = [
@@ -25,6 +35,10 @@ function Nav({ page, setPage, variant, setVariant }) {
 
   function openFeat()  { clearTimeout(closeTimer.current); setFeatOpen(true); }
   function closeFeat() { closeTimer.current = setTimeout(() => setFeatOpen(false), 120); }
+
+  function openApp()  { clearTimeout(appCloseTimer.current); setAppOpen(true); }
+  function closeApp() { appCloseTimer.current = setTimeout(() => setAppOpen(false), 120); }
+  function goApp(item) { if (item.href) window.location.href = item.href; }
 
   return (
     <nav className="nav">
@@ -75,6 +89,32 @@ function Nav({ page, setPage, variant, setVariant }) {
           {links.filter(l => l.k !== "home").map(l => (
             <button key={l.k} data-active={page === l.k || (l.anchor && page === "home")} onClick={() => l.anchor ? goAnchor(l.k) : setPage(l.k)}>{l.l}</button>
           ))}
+
+          {/* USE APP with dropdown (Admin / Partner / User) */}
+          <div style={{ position: "relative" }} onMouseEnter={openApp} onMouseLeave={closeApp}>
+            <button onClick={openApp}>
+              Use App
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style={{ marginLeft: 4, opacity: 0.5 }}>
+                <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+
+            {appOpen && (
+              <div className="feat-dropdown" onMouseEnter={openApp} onMouseLeave={closeApp}>
+                {appItems.map(a => (
+                  <button
+                    key={a.k}
+                    onClick={() => { setAppOpen(false); goApp(a); }}
+                    disabled={!a.href}
+                    style={{ opacity: a.href ? 1 : 0.5, cursor: a.href ? "pointer" : "default" }}
+                  >
+                    <span style={{ fontSize: 13, fontWeight: 700, width: 64, flexShrink: 0 }}>{a.label}</span>
+                    <span style={{ fontSize: 12, fontWeight: 500, color: "#8A94A6" }}>{a.desc}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         <div className="nav-cta">
           <button className="btn btn-primary" onClick={() => goAnchor("download")}>Download</button>
@@ -104,6 +144,14 @@ function Nav({ page, setPage, variant, setVariant }) {
           ))}
           <button className="mobile-menu-link" onClick={() => { goAnchor("pricing"); setMobileOpen(false); }}>Pricing</button>
           <button className="mobile-menu-link" onClick={() => { goAnchor("contact"); setMobileOpen(false); }}>Support</button>
+          <div className="mobile-menu-label">Use App</div>
+          {appItems.map(a => (
+            <button key={a.k} className="mobile-menu-link" disabled={!a.href}
+              style={{ opacity: a.href ? 1 : 0.5 }}
+              onClick={() => { if (a.href) { setMobileOpen(false); window.location.href = a.href; } }}>
+              {a.label}<span style={{ fontSize: 12, color: "#8A94A6", marginLeft: 8 }}>{a.desc}</span>
+            </button>
+          ))}
           <div className="mobile-menu-download">
             <button className="btn btn-primary" style={{ width: "100%", justifyContent: "center" }} onClick={() => { goAnchor("download"); setMobileOpen(false); }}>Download</button>
           </div>

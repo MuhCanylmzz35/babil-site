@@ -177,7 +177,7 @@
         '<span class="cd">' + esc(c.code) + '</span>' +
         (c.campaign ? '<span class="meta">· ' + esc(c.campaign) + '</span>' : '') +
         '<span class="grow"></span>' +
-        '<span class="reward">' + esc(rewardLabel(c.reward_type, c.reward_duration_months)) + '</span>' +
+        '<span class="reward">' + esc(rewardLabel(c.reward_type, c.reward_duration_months)) + (c.activation_mode === 'instant' ? ' · instant' : '') + '</span>' +
         '<button class="inline" data-copy="' + esc(c.code) + '">Copy code</button>' +
         '<button class="inline" data-copy="' + esc(link) + '">Copy link</button>';
       el.appendChild(div);
@@ -223,7 +223,7 @@
         var partner = p.data;
         document.getElementById('helloName').textContent = 'Hi, ' + (partner.display_name || 'Partner');
         return Promise.all([
-          sb.from('referral_codes').select('code, campaign, reward_type, reward_duration_months, active'),
+          sb.from('referral_codes').select('code, campaign, reward_type, reward_duration_months, activation_mode, active'),
           sb.from('referral_redemptions').select('status, redeemed_at, claimed_at, granted_at, referred_user_id'),
           sb.from('partner_link_clicks').select('id', { count: 'exact', head: true })
         ]).then(function(out){

@@ -34,10 +34,12 @@
   .lead{color:var(--text2);font-size:14.5px;line-height:1.6;margin-bottom:18px}
   form{display:flex;flex-direction:column;gap:14px}
   label{font-size:11px;font-weight:600;letter-spacing:.8px;color:var(--text2);text-transform:uppercase}
-  input[type=email]{width:100%;background:transparent;border:1px solid var(--border);border-radius:14px;
+  input[type=email],input[type=password]{width:100%;background:transparent;border:1px solid var(--border);border-radius:14px;
     color:var(--text);font-size:16px;padding:14px;outline:none;transition:border-color .15s}
-  input[type=email]:focus{border-color:var(--primary)}
-  input[type=email]::placeholder{color:var(--dim)}
+  input[type=email]:focus,input[type=password]:focus{border-color:var(--primary)}
+  input[type=email]::placeholder,input[type=password]::placeholder{color:var(--dim)}
+  .field{display:flex;flex-direction:column;gap:7px}
+  .link{background:none;border:none;color:var(--primary-muted);font-size:13px;font-weight:600;cursor:pointer;padding:0}
   .btn{position:relative;width:100%;background:var(--primary);color:#fff;border:none;text-align:center;
     font-size:14px;font-weight:700;padding:14px;border-radius:22px;cursor:pointer;transition:opacity .15s}
   .btn:hover{opacity:.92}
@@ -80,13 +82,22 @@
 
   <div id="formView" class="body">
     <h1>Partner sign-in</h1>
-    <p class="lead">Enter the email your Babil partner account is registered with. We'll send you a secure sign-in link, no password needed.</p>
+    <p class="lead">Sign in with the email and password you set when you created your partner profile.</p>
     <form id="loginForm" novalidate>
-      <label for="email">Email address</label>
-      <input id="email" name="email" type="email" inputmode="email" autocomplete="email"
-             placeholder="you@example.com" autocapitalize="off" spellcheck="false" />
-      <button id="submitBtn" class="btn" type="submit">Send sign-in link</button>
+      <div class="field">
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="email"
+               placeholder="you@example.com" autocapitalize="off" spellcheck="false" />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" />
+      </div>
+      <button id="submitBtn" class="btn" type="submit">Sign in</button>
       <div id="msg" class="msg" role="status" aria-live="polite"></div>
+      <div style="text-align:center">
+        <button id="forgotBtn" class="link" type="button">Forgot password?</button>
+      </div>
     </form>
   </div>
 
@@ -97,7 +108,7 @@
       </svg>
     </div>
     <h2>Check your email</h2>
-    <p>If <span id="sentEmail" class="em"></span> belongs to a Babil partner, a sign-in link is on its way. Open it on this device to enter the portal.</p>
+    <p>If <span id="sentEmail" class="em"></span> has a Babil partner account, a password reset link is on its way. Open it on this device to set a new password.</p>
   </div>
 
   <p class="foot"><a href="/">&larr; babilfinance.com</a></p>
@@ -109,13 +120,16 @@
   var SUPABASE_URL = "https://nucsizdduvpojjtvayvn.supabase.co";
   var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51Y3NpemRkdXZwb2pqdHZheXZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MTM4MDksImV4cCI6MjA5NDI4OTgwOX0.CSQLhokxnSC6E3BuXbeVil6kjg39QkI9ABF0fNgqQgg";
   var REDIRECT = "https://babilfinance.com/partner-dashboard";
+  var RESET_REDIRECT = location.origin + "/reset-password";
   var EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
   var sb = window.supabase.createClient(SUPABASE_URL, ANON);
 
   var form = document.getElementById("loginForm");
   var input = document.getElementById("email");
+  var passIn = document.getElementById("password");
   var btn = document.getElementById("submitBtn");
+  var forgotBtn = document.getElementById("forgotBtn");
   var msg = document.getElementById("msg");
   var formView = document.getElementById("formView");
   var successView = document.getElementById("successView");
@@ -128,36 +142,42 @@
 
   function showError(t){ msg.textContent = t; msg.classList.add("err"); }
   function clearError(){ msg.textContent = ""; msg.classList.remove("err"); }
-  function setLoading(on){ btn.disabled = on; btn.innerHTML = on ? '<span class="spin"></span>Sending…' : 'Send sign-in link'; }
+  function setLoading(on){ btn.disabled = on; btn.innerHTML = on ? '<span class="spin"></span>Signing in…' : 'Sign in'; }
   function showSent(email){ sentEmail.textContent = email; formView.classList.add("hidden"); successView.classList.remove("hidden"); }
 
   input.addEventListener("input", clearError);
+  passIn.addEventListener("input", clearError);
 
   form.addEventListener("submit", function(e){
     e.preventDefault();
     clearError();
     var email = (input.value || "").trim().toLowerCase();
+    var pass = passIn.value || "";
     if(!EMAIL_RE.test(email)){ showError("Please enter a valid email address."); return; }
+    if(!pass){ showError("Please enter your password."); return; }
     setLoading(true);
 
-    sb.auth.signInWithOtp({
-      email: email,
-      options: { shouldCreateUser: false, emailRedirectTo: REDIRECT }
-    }).then(function(res){
-      // Do not leak whether the email is a registered partner.
-      if(res.error){
-        var m = (res.error.message || "").toLowerCase();
-        if(m.indexOf("signup") !== -1 || m.indexOf("not allowed") !== -1 || m.indexOf("not found") !== -1){
-          showSent(email); return;
-        }
-        setLoading(false);
-        showError("Something went wrong. Please try again in a moment.");
-        return;
-      }
-      showSent(email);
+    sb.auth.signInWithPassword({ email: email, password: pass }).then(function(res){
+      if(res.error){ setLoading(false); showError("Wrong email or password."); return; }
+      location.replace(REDIRECT);
     }).catch(function(){
       setLoading(false);
       showError("Network error. Please check your connection and try again.");
+    });
+  });
+
+  // Forgot password: email a reset link (does not leak whether the
+  // account exists). The link lands on /reset-password.
+  forgotBtn.addEventListener("click", function(){
+    clearError();
+    var email = (input.value || "").trim().toLowerCase();
+    if(!EMAIL_RE.test(email)){ showError("Enter your email above first, then tap Forgot password."); return; }
+    forgotBtn.disabled = true;
+    sb.auth.resetPasswordForEmail(email, { redirectTo: RESET_REDIRECT }).then(function(){
+      showSent(email);
+    }).catch(function(){
+      forgotBtn.disabled = false;
+      showError("Network error. Please try again.");
     });
   });
 })();
