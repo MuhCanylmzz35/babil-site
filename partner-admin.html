@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Babil Partner Admin</title>
+<title>Babil Admin</title>
 <meta name="description" content="Babil partner admin." />
 <meta name="robots" content="noindex, nofollow" />
 <meta name="theme-color" content="#0D1117" />
@@ -11,248 +11,321 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
 <style>
   :root{
-    --bg:#0D1117; --elev:#161B2C; --border:#1E2640; --border-ghost:#1E264022;
-    --primary:#6C63FF; --primary-muted:#A78BFA; --red:#FF5C5C; --green:#00D4AA;
-    --warning:#FFB547; --text:#FFFFFF; --text2:#8A94A6; --dim:#3A4258;
+    --bg:#0D1117; --elev:#161B2C; --elev2:#1A2033; --border:#1E2640; --border-ghost:#1E264022;
+    --primary:#6C63FF; --primary-muted:#A78BFA; --primary-tint:#6C63FF1F; --primary-tint2:#6C63FF14;
+    --red:#FF5C5C; --green:#00D4AA; --warning:#FFB547; --text:#FFFFFF; --text2:#8A94A6; --dim:#4A5468;
+    --sidebar-w:248px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    min-height:100vh;padding:28px 0 64px}
-  .wrap{width:100%;max-width:620px;margin:0 auto;padding:0 4px}
-  .brandrow{display:flex;align-items:center;justify-content:space-between;padding:0 20px;margin-bottom:6px}
-  .brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px}
-  .brandname{background:linear-gradient(135deg,#FFB547,#FF6B35);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
-  .logo{width:26px;height:26px}
-  .eyebrow{color:var(--text2);font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  input,select,button{font-family:inherit}
 
-  .sectionHeader{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 14px;border-top:1px solid var(--border);border-bottom:1px solid var(--border-ghost)}
-  .sectionHeader.first{border-top:0}
-  .sectionTitle{color:var(--text2);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+  /* ---------- App shell (sidebar + main) ---------- */
+  .app{display:flex;min-height:100vh}
+  .sidebar{width:var(--sidebar-w);flex:0 0 var(--sidebar-w);background:var(--elev);
+    border-right:1px solid var(--border);display:flex;flex-direction:column;
+    position:sticky;top:0;height:100vh}
+  .sb-brand{display:flex;align-items:center;gap:10px;padding:20px 18px 16px}
+  .sb-brand .logo{width:26px;height:26px;flex:0 0 auto}
+  .sb-brand .name{font-weight:800;font-size:18px;
+    background:linear-gradient(135deg,#FFB547,#FF6B35);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  .sb-brand .tag{margin-left:auto;font-size:10px;font-weight:700;letter-spacing:.7px;color:var(--text2);
+    text-transform:uppercase;border:1px solid var(--border);border-radius:999px;padding:3px 9px}
 
-  .body{padding:18px 20px 4px}
-  h1{font-size:22px;font-weight:800;line-height:1.2;margin-bottom:10px}
-  .lead{color:var(--text2);font-size:14.5px;line-height:1.6;margin-bottom:18px}
-  form{display:flex;flex-direction:column;gap:14px}
-  label{font-size:11px;font-weight:600;letter-spacing:.8px;color:var(--text2);text-transform:uppercase}
-  input,select{width:100%;background:transparent;border:1px solid var(--border);border-radius:14px;
-    color:var(--text);font-size:16px;padding:14px;outline:none;transition:border-color .15s;appearance:none}
+  .sb-group{padding:8px 12px}
+  .sb-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim);padding:10px 10px 6px}
+  .nav-item{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:transparent;border:none;
+    color:var(--text2);font-size:14px;font-weight:600;padding:10px 11px;border-radius:10px;cursor:pointer;transition:background .12s,color .12s}
+  .nav-item svg{width:18px;height:18px;flex:0 0 auto}
+  .nav-item:hover{background:var(--primary-tint2);color:var(--text)}
+  .nav-item[data-active="true"]{background:var(--primary-tint);color:#fff}
+  .nav-item[data-active="true"] svg{color:var(--primary-muted)}
+
+  .sb-foot{margin-top:auto;border-top:1px solid var(--border);padding:14px 16px}
+  .sb-account{font-size:12px;color:var(--text2);word-break:break-all;line-height:1.4;margin-bottom:10px}
+  .sb-account b{display:block;color:var(--text);font-weight:600;font-size:13px}
+  .sb-out{display:inline-flex;align-items:center;gap:7px;background:transparent;border:1px solid var(--border);
+    color:var(--text2);font-size:13px;font-weight:600;padding:8px 13px;border-radius:10px;cursor:pointer}
+  .sb-out:hover{color:var(--text);border-color:var(--dim)}
+  .sb-home{display:block;margin-top:12px;color:var(--dim);font-size:12px;text-decoration:none}
+  .sb-home:hover{color:var(--text2)}
+
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:22px 32px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(13,17,23,.82);backdrop-filter:blur(8px);z-index:5}
+  .topbar h1{font-size:20px;font-weight:800;letter-spacing:-.3px}
+  .topbar .sub{color:var(--text2);font-size:13px;margin-top:3px}
+  .content{padding:26px 32px 60px;max-width:920px;width:100%}
+
+  /* ---------- Panels / cards ---------- */
+  .panel{background:var(--elev);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px}
+  .panel-h{font-size:13px;font-weight:700;letter-spacing:.4px;margin-bottom:4px}
+  .panel-sub{color:var(--text2);font-size:13px;line-height:1.6;margin-bottom:18px}
+
+  /* ---------- Forms ---------- */
+  form{display:flex;flex-direction:column;gap:16px}
+  label{font-size:11px;font-weight:700;letter-spacing:.6px;color:var(--text2);text-transform:uppercase}
+  input,select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:11px;
+    color:var(--text);font-size:15px;padding:12px 13px;outline:none;transition:border-color .15s;appearance:none}
   input:focus,select:focus{border-color:var(--primary)}
   input::placeholder{color:var(--dim)}
   select option{background:var(--elev);color:var(--text)}
   .field{display:flex;flex-direction:column;gap:7px}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   .checkrow{display:flex;align-items:center;gap:10px}
   .checkrow input{width:18px;height:18px;flex:0 0 auto}
-  .checkrow span{font-size:13px;color:var(--text2)}
+  .checkrow span{font-size:13.5px;color:var(--text)}
   .hint{color:var(--dim);font-size:12px;line-height:1.5}
-  .btn{position:relative;width:100%;background:var(--primary);color:#fff;border:none;text-align:center;
-    font-size:14px;font-weight:700;padding:14px;border-radius:22px;cursor:pointer;transition:opacity .15s}
+
+  .btn{position:relative;background:var(--primary);color:#fff;border:none;text-align:center;
+    font-size:14px;font-weight:700;padding:13px 16px;border-radius:12px;cursor:pointer;transition:opacity .15s}
   .btn:hover{opacity:.92}
-  .btn:disabled{opacity:.35;cursor:default}
-  .btn .spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.45);
-    border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;vertical-align:-3px;margin-right:8px}
+  .btn:disabled{opacity:.4;cursor:default}
+  .btn .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.45);
+    border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;vertical-align:-2px;margin-right:8px}
   @keyframes spin{to{transform:rotate(360deg)}}
-  .ghost{background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:22px;
-    font-size:13px;font-weight:600;padding:9px 16px;cursor:pointer}
-  .ghost:hover{color:var(--text);border-color:var(--dim)}
   .link{background:none;border:none;color:var(--primary-muted);font-size:13px;font-weight:600;cursor:pointer;padding:0}
-  .inline{background:transparent;color:var(--primary-muted);border:1px solid var(--border);border-radius:12px;
+  .link:hover{text-decoration:underline}
+  .inline{background:var(--elev2);color:var(--primary-muted);border:1px solid var(--border);border-radius:9px;
     font-size:12px;font-weight:600;padding:7px 12px;cursor:pointer;white-space:nowrap}
-  .inline:hover{border-color:var(--primary)}
+  .inline:hover{border-color:var(--primary);color:#fff}
   .msg{font-size:13px;line-height:1.5}
-  .msg.err{color:var(--red)}
-  .msg.ok{color:var(--green)}
-  .hidden{display:none}
+  .msg.err{color:var(--red)} .msg.ok{color:var(--green)}
+  .hidden{display:none!important}
 
-  .tabs{display:flex;gap:8px;padding:14px 20px 0}
-  .tab{background:transparent;border:none;color:var(--text2);font-size:14px;font-weight:700;
-    padding:8px 4px;cursor:pointer;border-bottom:2px solid transparent}
-  .tab[data-active="true"]{color:var(--text);border-bottom-color:var(--primary)}
-
-  .linkbox{margin-top:4px;border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+  /* ---------- Result link box ---------- */
+  .linkbox{margin-top:16px;background:var(--bg);border:1px solid var(--primary-tint);border-radius:12px;padding:15px;display:flex;flex-direction:column;gap:11px}
   .linkbox .url{font-size:13px;color:var(--primary-muted);word-break:break-all;line-height:1.5}
   .linkbox .meta{color:var(--dim);font-size:12px}
 
-  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border-ghost)}
-  .row.click{cursor:pointer}
-  .row.click:hover{background:var(--border-ghost)}
+  /* ---------- Lists / rows ---------- */
+  .list{background:var(--elev);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid var(--border-ghost)}
+  .row:last-child{border-bottom:none}
+  .row.click{cursor:pointer} .row.click:hover{background:var(--primary-tint2)}
   .row .left{min-width:0}
   .row .note{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .row .sub{color:var(--text2);font-size:12px;margin-top:2px}
-  .status{font-size:12px;font-weight:700}
-  .status.pending{color:var(--text2)}
-  .status.eligible{color:var(--warning)}
-  .status.claimed{color:var(--warning)}
-  .status.granted{color:var(--green)}
-  .status.expired{color:var(--red)}
-  .empty{padding:16px 20px;color:var(--dim);font-size:13px}
+  .row .sub{color:var(--text2);font-size:12px;margin-top:3px}
+  .right{display:flex;align-items:center;gap:12px;flex:0 0 auto}
+  .status{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  .status.pending{color:var(--text2)} .status.eligible,.status.claimed{color:var(--warning)}
+  .status.granted{color:var(--green)} .status.expired{color:var(--red)}
+  .empty{padding:18px;color:var(--dim);font-size:13px;text-align:center}
 
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border-ghost);margin:0 20px;border-radius:12px;overflow:hidden}
-  .stat{background:var(--bg);padding:12px 10px;text-align:center}
-  .stat .n{font-size:18px;font-weight:800}
-  .stat .l{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+  /* ---------- Stat cells ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+  .stat{background:var(--elev);border:1px solid var(--border);border-radius:14px;padding:16px 14px}
+  .stat .n{font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1}
+  .stat .l{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-top:7px}
 
-  .foot{color:var(--dim);font-size:12px;text-align:center;margin-top:22px}
-  .foot a{color:var(--text2);text-decoration:none}
+  .banner{background:#3A1E1E;border:1px solid var(--red);color:#FFD2D2;border-radius:12px;padding:13px 15px;font-size:13px;margin-bottom:18px}
+
+  /* ---------- Auth screen ---------- */
+  .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .auth-card{width:100%;max-width:400px;background:var(--elev);border:1px solid var(--border);border-radius:20px;padding:30px 26px}
+  .auth-brand{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+  .auth-brand .logo{width:30px;height:30px}
+  .auth-brand .name{font-weight:800;font-size:20px;background:linear-gradient(135deg,#FFB547,#FF6B35);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  .auth-brand .tag{margin-left:auto;font-size:10px;font-weight:700;letter-spacing:.7px;color:var(--text2);text-transform:uppercase}
+  .auth-card h1{font-size:22px;font-weight:800;margin-bottom:8px}
+  .auth-card .lead{color:var(--text2);font-size:14px;line-height:1.6;margin-bottom:22px}
+  .auth-foot{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+
+  /* ---------- Responsive: collapse sidebar to top bar ---------- */
+  @media(max-width:840px){
+    .app{flex-direction:column}
+    .sidebar{width:100%;flex:0 0 auto;height:auto;position:sticky;top:0;flex-direction:column;z-index:10}
+    .sb-brand{padding:14px 16px 10px}
+    .sb-group{display:flex;gap:6px;padding:0 12px 10px;overflow-x:auto}
+    .sb-label{display:none}
+    .nav-item{width:auto;white-space:nowrap;padding:9px 13px}
+    .sb-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;border-top:1px solid var(--border)}
+    .sb-account{margin-bottom:0;font-size:11px}
+    .sb-account b{display:inline;font-size:12px}
+    .sb-home{display:none}
+    .topbar{padding:16px 18px}
+    .content{padding:18px 16px 48px}
+    .grid2{grid-template-columns:1fr}
+    .stats{grid-template-columns:repeat(2,1fr)}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="brandrow">
-    <div class="brand">
+
+<!-- ===================== AUTH ===================== -->
+<div id="authView" class="auth-wrap hidden">
+  <div class="auth-card">
+    <div class="auth-brand">
       <svg class="logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="18" y1="10" x2="102" y2="110"><stop offset="0" stop-color="#FFB547"/><stop offset="1" stop-color="#FF6B35"/></linearGradient></defs>
-        <path d="M60,10 L102,35 L102,85 L60,110 L18,85 L18,35 Z" fill="none" stroke="url(#g)" stroke-width="6" stroke-linejoin="round"/>
-        <line x1="42" y1="82" x2="42" y2="62" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
-        <line x1="60" y1="82" x2="60" y2="48" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
-        <line x1="78" y1="82" x2="78" y2="32" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
+        <defs><linearGradient id="ga" gradientUnits="userSpaceOnUse" x1="18" y1="10" x2="102" y2="110"><stop offset="0" stop-color="#FFB547"/><stop offset="1" stop-color="#FF6B35"/></linearGradient></defs>
+        <path d="M60,10 L102,35 L102,85 L60,110 L18,85 L18,35 Z" fill="none" stroke="url(#ga)" stroke-width="6" stroke-linejoin="round"/>
+        <line x1="42" y1="82" x2="42" y2="62" stroke="url(#ga)" stroke-width="8" stroke-linecap="round"/>
+        <line x1="60" y1="82" x2="60" y2="48" stroke="url(#ga)" stroke-width="8" stroke-linecap="round"/>
+        <line x1="78" y1="82" x2="78" y2="32" stroke="url(#ga)" stroke-width="8" stroke-linecap="round"/>
       </svg>
-      <span class="brandname">Babil</span>
+      <span class="name">Babil</span>
+      <span class="tag">Admin</span>
     </div>
-    <span class="eyebrow">Partner Admin</span>
+    <h1 id="authHeading">Admin sign-in</h1>
+    <p class="lead" id="authLead">Sign in with your admin email and password.</p>
+    <form id="authForm" novalidate>
+      <div class="field">
+        <label for="email">Email address</label>
+        <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" autocapitalize="off" spellcheck="false" />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="At least 8 characters" />
+      </div>
+      <button id="authBtn" class="btn" type="submit">Sign in</button>
+      <div id="authMsg" class="msg" role="status" aria-live="polite"></div>
+    </form>
   </div>
+</div>
 
-  <!-- Auth (sign in / create account) -->
-  <div id="authSection" class="hidden">
-    <div class="sectionHeader first"><span class="sectionTitle" id="authTitle">Admin sign in</span></div>
-    <div class="body">
-      <h1 id="authHeading">Admin sign-in</h1>
-      <p class="lead" id="authLead">Sign in with your admin email and password.</p>
-      <form id="authForm" novalidate>
-        <div class="field">
-          <label for="email">Email address</label>
-          <input id="email" type="email" inputmode="email" autocomplete="email"
-                 placeholder="you@example.com" autocapitalize="off" spellcheck="false" />
-        </div>
-        <div class="field">
-          <label for="password">Password</label>
-          <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" />
-        </div>
-        <button id="authBtn" class="btn" type="submit">Sign in</button>
-        <div id="authMsg" class="msg" role="status" aria-live="polite"></div>
-        <div style="text-align:center">
-          <button id="toggleMode" class="link" type="button">Create an admin account</button>
-        </div>
-      </form>
+<!-- ===================== APP ===================== -->
+<div id="appView" class="app hidden">
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <svg class="logo" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="gs" gradientUnits="userSpaceOnUse" x1="18" y1="10" x2="102" y2="110"><stop offset="0" stop-color="#FFB547"/><stop offset="1" stop-color="#FF6B35"/></linearGradient></defs>
+        <path d="M60,10 L102,35 L102,85 L60,110 L18,85 L18,35 Z" fill="none" stroke="url(#gs)" stroke-width="6" stroke-linejoin="round"/>
+        <line x1="42" y1="82" x2="42" y2="62" stroke="url(#gs)" stroke-width="8" stroke-linecap="round"/>
+        <line x1="60" y1="82" x2="60" y2="48" stroke="url(#gs)" stroke-width="8" stroke-linecap="round"/>
+        <line x1="78" y1="82" x2="78" y2="32" stroke="url(#gs)" stroke-width="8" stroke-linecap="round"/>
+      </svg>
+      <span class="name">Babil</span>
+      <span class="tag">Admin</span>
     </div>
-  </div>
-
-  <!-- Admin home -->
-  <div id="adminSection" class="hidden">
-    <div class="sectionHeader first">
-      <span class="sectionTitle">Control portal</span>
-      <button id="signOut" class="ghost" type="button">Sign out</button>
+    <nav class="sb-group">
+      <div class="sb-label">Control portal</div>
+      <button class="nav-item" data-nav="invites" data-active="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9a2 2 0 0 0 0 6v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2a2 2 0 0 0 0-6V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2z"/><path d="M14 5v14"/></svg>
+        Invites
+      </button>
+      <button class="nav-item" data-nav="partners" data-active="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Partners
+      </button>
+    </nav>
+    <div class="sb-foot">
+      <div class="sb-account"><b id="acctEmail">&nbsp;</b> Signed in</div>
+      <button id="signOut" class="sb-out" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </button>
+      <a class="sb-home" href="/">&larr; babilfinance.com</a>
     </div>
-    <div id="adminBanner" class="body hidden"><div class="msg err"></div></div>
+  </aside>
 
-    <div class="tabs">
-      <button class="tab" data-tab="invites" data-active="true">Invites</button>
-      <button class="tab" data-tab="partners" data-active="false">Partners</button>
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="pageTitle">Invites</h1>
+        <div class="sub" id="pageSub">Create and track single-use partner invite links.</div>
+      </div>
     </div>
+    <div class="content">
+      <div id="adminBanner" class="banner hidden"></div>
 
-    <!-- Invites tab -->
-    <div id="invitesTab">
-      <div class="body">
-        <p class="lead">Create a single-use link for a partner. They open it, set their email, name, password, and code. The link expires in 14 days. The reward settings below are locked into that partner's code.</p>
-        <form id="inviteForm" novalidate>
-          <div class="field">
-            <label for="note">Label (optional)</label>
-            <input id="note" type="text" placeholder="e.g. Merve, W&amp;T 2026" maxlength="120" />
-            <span class="hint">Only you see this, to tell links apart.</span>
-          </div>
-          <div class="field">
-            <label for="campaign">Campaign (optional)</label>
-            <input id="campaign" type="text" placeholder="e.g. W&amp;T 2026" maxlength="80" />
-          </div>
+      <!-- ===== Invites ===== -->
+      <section id="view-invites">
+        <div class="panel">
+          <div class="panel-h">New invite link</div>
+          <p class="panel-sub">The partner opens this single-use link, then sets their own email, name, password and code. It expires in 14 days. The reward settings you pick here are locked into that partner's code.</p>
+          <form id="inviteForm" novalidate>
+            <div class="grid2">
+              <div class="field">
+                <label for="note">Label (optional)</label>
+                <input id="note" type="text" placeholder="e.g. Merve, W&amp;T 2026" maxlength="120" />
+              </div>
+              <div class="field">
+                <label for="campaign">Campaign (optional)</label>
+                <input id="campaign" type="text" placeholder="e.g. W&amp;T 2026" maxlength="80" />
+              </div>
+            </div>
 
-          <div class="grid2">
+            <div class="grid2">
+              <div class="field">
+                <label for="rewardType">Referred user reward</label>
+                <select id="rewardType"><option value="premium">Premium</option><option value="unlimited">Unlimited</option></select>
+              </div>
+              <div class="field">
+                <label for="rewardMonths">Reward months</label>
+                <input id="rewardMonths" type="number" min="1" max="12" value="1" />
+              </div>
+            </div>
+
             <div class="field">
-              <label for="rewardType">Referred user reward</label>
-              <select id="rewardType">
-                <option value="premium">Premium</option>
-                <option value="unlimited">Unlimited</option>
+              <label for="activationMode">Activation</label>
+              <select id="activationMode">
+                <option value="deferred">Deferred — user activates when ready</option>
+                <option value="instant">Instant — auto on onboarding completion</option>
               </select>
             </div>
-            <div class="field">
-              <label for="rewardMonths">Reward months</label>
-              <input id="rewardMonths" type="number" min="1" max="12" value="1" />
-            </div>
-          </div>
 
-          <div class="field">
-            <label for="activationMode">Activation</label>
-            <select id="activationMode">
-              <option value="deferred">Deferred (user activates when ready)</option>
-              <option value="instant">Instant (auto on onboarding completion)</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>Partner reward</label>
-            <div class="checkrow">
-              <input id="partnerEnabled" type="checkbox" checked />
-              <span>Give the partner a free reward for each activation</span>
-            </div>
-          </div>
-          <div class="grid2" id="partnerRewardRow">
             <div class="field">
-              <label for="partnerRewardType">Partner reward type</label>
-              <select id="partnerRewardType">
-                <option value="">Same as referred</option>
-                <option value="premium">Premium</option>
-                <option value="unlimited">Unlimited</option>
-              </select>
+              <label>Partner reward</label>
+              <div class="checkrow"><input id="partnerEnabled" type="checkbox" checked /><span>Give the partner a free reward for each activation</span></div>
             </div>
-            <div class="field">
-              <label for="partnerRewardMonths">Partner months</label>
-              <input id="partnerRewardMonths" type="number" min="1" max="12" placeholder="Same" />
+            <div class="grid2" id="partnerRewardRow">
+              <div class="field">
+                <label for="partnerRewardType">Partner reward type</label>
+                <select id="partnerRewardType"><option value="">Same as referred</option><option value="premium">Premium</option><option value="unlimited">Unlimited</option></select>
+              </div>
+              <div class="field">
+                <label for="partnerRewardMonths">Partner months</label>
+                <input id="partnerRewardMonths" type="number" min="1" max="12" placeholder="Same" />
+              </div>
             </div>
-          </div>
 
-          <div class="grid2">
-            <div class="field">
-              <label for="codeValidMonths">Code valid (months)</label>
-              <input id="codeValidMonths" type="number" min="1" max="36" value="18" />
+            <div class="grid2">
+              <div class="field">
+                <label for="codeValidMonths">Code valid (months)</label>
+                <input id="codeValidMonths" type="number" min="1" max="36" value="18" />
+              </div>
+              <div class="field">
+                <label for="monthlyCap">Monthly cap</label>
+                <input id="monthlyCap" type="number" min="0" max="1000" value="50" />
+              </div>
             </div>
-            <div class="field">
-              <label for="monthlyCap">Monthly cap</label>
-              <input id="monthlyCap" type="number" min="0" max="1000" value="50" />
+
+            <button id="inviteBtn" class="btn" type="submit">Create invite link</button>
+            <div id="inviteMsg" class="msg" role="status" aria-live="polite"></div>
+          </form>
+
+          <div id="resultBox" class="linkbox hidden">
+            <div id="resultUrl" class="url"></div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <button id="copyBtn" class="inline" type="button">Copy link</button>
+              <span id="copyMsg" class="meta"></span>
             </div>
-          </div>
-
-          <button id="inviteBtn" class="btn" type="submit">Create invite link</button>
-          <div id="inviteMsg" class="msg" role="status" aria-live="polite"></div>
-        </form>
-
-        <div id="resultBox" class="linkbox hidden">
-          <div id="resultUrl" class="url"></div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <button id="copyBtn" class="inline" type="button">Copy link</button>
-            <span id="copyMsg" class="meta"></span>
           </div>
         </div>
-      </div>
 
-      <div class="sectionHeader"><span class="sectionTitle">Recent invites</span></div>
-      <div id="invitesList"><div class="empty">Loading…</div></div>
-    </div>
+        <div class="panel-h" style="padding:0 4px 10px">Recent invites</div>
+        <div id="invitesList" class="list"><div class="empty">Loading…</div></div>
+      </section>
 
-    <!-- Partners tab -->
-    <div id="partnersTab" class="hidden">
-      <div id="partnerDetail" class="hidden">
-        <div class="sectionHeader">
-          <span class="sectionTitle" id="detailName">Partner</span>
-          <button id="backToPartners" class="link" type="button">&larr; All partners</button>
+      <!-- ===== Partners ===== -->
+      <section id="view-partners" class="hidden">
+        <div id="partnersList" class="list"><div class="empty">Loading…</div></div>
+
+        <div id="partnerDetail" class="hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div class="panel-h" id="detailName" style="margin:0">Partner</div>
+            <button id="backToPartners" class="link" type="button">&larr; All partners</button>
+          </div>
+          <div class="stats" id="detailStats"></div>
+          <div class="panel-h" style="padding:0 4px 10px">Recent activity</div>
+          <div id="detailActivity" class="list"><div class="empty">Loading…</div></div>
         </div>
-        <div class="stats" id="detailStats"></div>
-        <div class="sectionHeader"><span class="sectionTitle">Recent activity</span></div>
-        <div id="detailActivity"><div class="empty">Loading…</div></div>
-      </div>
-      <div id="partnersList"><div class="empty">Loading…</div></div>
+      </section>
     </div>
-  </div>
-
-  <p class="foot"><a href="/">&larr; babilfinance.com</a></p>
+  </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -260,49 +333,27 @@
 (function(){
   var SUPABASE_URL = "https://nucsizdduvpojjtvayvn.supabase.co";
   var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51Y3NpemRkdXZwb2pqdHZheXZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MTM4MDksImV4cCI6MjA5NDI4OTgwOX0.CSQLhokxnSC6E3BuXbeVil6kjg39QkI9ABF0fNgqQgg";
-  var REDIRECT = "https://babilfinance.com/partner-admin";
   var EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
   var sb = window.supabase.createClient(SUPABASE_URL, ANON);
-
   var $ = function(id){ return document.getElementById(id); };
-  var authSection = $("authSection"), adminSection = $("adminSection");
+
+  var authView = $("authView"), appView = $("appView");
   var authForm = $("authForm"), emailIn = $("email"), passIn = $("password");
-  var authBtn = $("authBtn"), authMsg = $("authMsg"), toggleMode = $("toggleMode");
-  var authHeading = $("authHeading"), authLead = $("authLead"), authTitle = $("authTitle");
+  var authBtn = $("authBtn"), authMsg = $("authMsg");
   var adminBanner = $("adminBanner");
-  var mode = "signin"; // or "signup"
   var partnersLoaded = false;
 
-  function showAuth(){ authSection.classList.remove("hidden"); adminSection.classList.add("hidden"); }
   function setAuthMsg(t, kind){ authMsg.textContent=t||""; authMsg.className="msg"+(kind?(" "+kind):""); }
+  function showAuth(){ authView.classList.remove("hidden"); appView.classList.add("hidden"); }
 
   // Route on session.
   sb.auth.getSession().then(function(res){
-    if(res && res.data && res.data.session){ enterAdmin(); } else { showAuth(); }
+    if(res && res.data && res.data.session){ enterApp(res.data.session); } else { showAuth(); }
   });
 
-  // ---- Auth ----
-  toggleMode.addEventListener("click", function(){
-    mode = mode === "signin" ? "signup" : "signin";
-    setAuthMsg("");
-    if(mode === "signup"){
-      authTitle.textContent = "Create admin account";
-      authHeading.textContent = "Create your account";
-      authLead.textContent = "Use your admin email. Only allow-listed emails can manage partners.";
-      authBtn.textContent = "Create account";
-      passIn.setAttribute("autocomplete","new-password");
-      toggleMode.textContent = "I already have an account";
-    } else {
-      authTitle.textContent = "Admin sign in";
-      authHeading.textContent = "Admin sign-in";
-      authLead.textContent = "Sign in with your admin email and password.";
-      authBtn.textContent = "Sign in";
-      passIn.setAttribute("autocomplete","current-password");
-      toggleMode.textContent = "Create an admin account";
-    }
-  });
-
+  // ---- Sign in only. There is no admin signup: the single admin account
+  // already exists and is the only email on the app_admins allow-list. ----
   [emailIn, passIn].forEach(function(el){ el.addEventListener("input", function(){ setAuthMsg(""); }); });
 
   authForm.addEventListener("submit", function(e){
@@ -312,64 +363,59 @@
     var pass = passIn.value||"";
     if(!EMAIL_RE.test(email)){ setAuthMsg("Please enter a valid email address.","err"); return; }
     if(pass.length < 8){ setAuthMsg("Password must be at least 8 characters.","err"); return; }
-    authBtn.disabled = true; authBtn.innerHTML = '<span class="spin"></span>'+(mode==="signup"?"Creating…":"Signing in…");
-
-    if(mode === "signup"){
-      sb.auth.signUp({ email: email, password: pass, options:{ emailRedirectTo: REDIRECT } })
-        .then(function(res){
-          authBtn.disabled=false; authBtn.textContent="Create account";
-          if(res.error){ setAuthMsg(res.error.message || "Could not create account.","err"); return; }
-          if(res.data && res.data.session){ enterAdmin(); return; }
-          setAuthMsg("Account created. Check your email to confirm, then sign in.","ok");
-          mode = "signin"; toggleMode.click(); toggleMode.click();
-        })
-        .catch(function(){ authBtn.disabled=false; authBtn.textContent="Create account"; setAuthMsg("Network error. Please try again.","err"); });
-    } else {
-      sb.auth.signInWithPassword({ email: email, password: pass })
-        .then(function(res){
-          authBtn.disabled=false; authBtn.textContent="Sign in";
-          if(res.error){ setAuthMsg("Wrong email or password.","err"); return; }
-          enterAdmin();
-        })
-        .catch(function(){ authBtn.disabled=false; authBtn.textContent="Sign in"; setAuthMsg("Network error. Please try again.","err"); });
-    }
+    authBtn.disabled = true;
+    authBtn.innerHTML = '<span class="spin"></span>Signing in…';
+    sb.auth.signInWithPassword({ email: email, password: pass })
+      .then(function(res){
+        authBtn.disabled=false; authBtn.textContent="Sign in";
+        if(res.error){ setAuthMsg("Wrong email or password.","err"); return; }
+        enterApp(res.data.session);
+      })
+      .catch(function(){ authBtn.disabled=false; authBtn.textContent="Sign in"; setAuthMsg("Network error. Please try again.","err"); });
   });
 
   $("signOut").addEventListener("click", function(){ sb.auth.signOut().then(function(){ location.reload(); }); });
 
-  // ---- Admin home ----
-  function enterAdmin(){
-    authSection.classList.add("hidden");
-    adminSection.classList.remove("hidden");
-    switchTab("invites");
+  // ---- App ----
+  function enterApp(session){
+    authView.classList.add("hidden");
+    appView.classList.remove("hidden");
+    var em = session && session.user ? session.user.email : "";
+    $("acctEmail").textContent = em || "Admin";
+    navTo("invites");
     loadInvites();
   }
 
-  function showBanner(text){
-    adminBanner.classList.remove("hidden");
-    adminBanner.querySelector(".msg").textContent = text;
-  }
+  function showBanner(text){ adminBanner.classList.remove("hidden"); adminBanner.textContent = text; }
 
-  // Tabs
-  document.querySelectorAll(".tab").forEach(function(t){
-    t.addEventListener("click", function(){ switchTab(t.getAttribute("data-tab")); });
+  // Sidebar nav
+  var NAV = {
+    invites:{ title:"Invites", sub:"Create and track single-use partner invite links." },
+    partners:{ title:"Partners", sub:"Browse partners and their referral performance." }
+  };
+  document.querySelectorAll(".nav-item").forEach(function(b){
+    b.addEventListener("click", function(){ navTo(b.getAttribute("data-nav")); });
   });
-  function switchTab(name){
-    document.querySelectorAll(".tab").forEach(function(t){
-      t.setAttribute("data-active", String(t.getAttribute("data-tab") === name));
+  function navTo(name){
+    document.querySelectorAll(".nav-item").forEach(function(b){
+      b.setAttribute("data-active", String(b.getAttribute("data-nav") === name));
     });
-    $("invitesTab").classList.toggle("hidden", name !== "invites");
-    $("partnersTab").classList.toggle("hidden", name !== "partners");
-    if(name === "partners" && !partnersLoaded){ partnersLoaded = true; loadPartners(); }
+    $("pageTitle").textContent = NAV[name].title;
+    $("pageSub").textContent = NAV[name].sub;
+    $("view-invites").classList.toggle("hidden", name !== "invites");
+    $("view-partners").classList.toggle("hidden", name !== "partners");
+    if(name === "partners"){
+      // Always return to the list when entering the tab.
+      $("partnerDetail").classList.add("hidden"); $("partnersList").classList.remove("hidden");
+      if(!partnersLoaded){ partnersLoaded = true; loadPartners(); }
+    }
   }
 
   // ---- Invite creation ----
   var inviteForm = $("inviteForm"), inviteBtn = $("inviteBtn"), inviteMsg = $("inviteMsg");
   var resultBox = $("resultBox"), resultUrl = $("resultUrl"), copyBtn = $("copyBtn"), copyMsg = $("copyMsg");
 
-  $("partnerEnabled").addEventListener("change", function(){
-    $("partnerRewardRow").style.opacity = this.checked ? "1" : "0.4";
-  });
+  $("partnerEnabled").addEventListener("change", function(){ $("partnerRewardRow").style.opacity = this.checked ? "1" : "0.4"; });
 
   inviteForm.addEventListener("submit", function(e){
     e.preventDefault();
@@ -390,7 +436,7 @@
       partner_reward_type: partnerEnabled ? prType : null,
       partner_reward_duration_months: partnerEnabled ? prMonths : null,
       code_valid_months: Number($("codeValidMonths").value) || 18,
-      monthly_cap: $("monthlyCap").value === "" ? 50 : Number($("monthlyCap").value),
+      monthly_cap: $("monthlyCap").value === "" ? 50 : Number($("monthlyCap").value)
     };
 
     sb.functions.invoke("create-partner-invite", { body: body })
@@ -425,16 +471,15 @@
 
   function fmtDate(s){ try{ return new Date(s).toLocaleDateString(undefined,{month:"short",day:"numeric"}); }catch(_){ return ""; } }
   function esc(s){ var d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
-  function rewardLabel(type, months, mode){
+  function rewardLabel(type, months, m){
     var t = type==="unlimited" ? "Unlimited" : "Premium";
-    var m = (months||1) + (months===1?"mo":"mo");
-    return t + " · " + m + (mode==="instant" ? " · instant" : "");
+    return t + " · " + (months||1) + "mo" + (m==="instant" ? " · instant" : "");
   }
 
   function loadInvites(){
     sb.rpc("admin_list_invites").then(function(res){
       if(res.error){
-        if((res.error.message||"").indexOf("not_admin")!==-1){ showBanner("This account is not an admin. Ask an existing admin to add your email."); }
+        if((res.error.message||"").indexOf("not_admin")!==-1){ showBanner("This account is not an admin. Ask an existing admin to add your email to app_admins."); }
         $("invitesList").innerHTML = '<div class="empty">Could not load invites.</div>'; return;
       }
       adminBanner.classList.add("hidden");
@@ -448,7 +493,7 @@
         html += '<div class="row"><div class="left">'
           + '<div class="note">'+esc(it.note && it.note.length ? it.note : "Invite")+'</div>'
           + '<div class="sub">'+sub+(reward?(' · '+reward):'')+'</div></div>'
-          + '<div style="display:flex;align-items:center;gap:10px">'
+          + '<div class="right">'
           + (st==="pending" ? '<button class="inline" data-token="'+esc(it.token)+'">Copy link</button>' : '')
           + '<span class="status '+st+'">'+st+'</span></div></div>';
       });
@@ -477,7 +522,7 @@
         html += '<div class="row click" data-pid="'+esc(p.partner_id)+'" data-name="'+esc(p.display_name)+'"><div class="left">'
           + '<div class="note">'+esc(p.display_name)+(p.code?(' · '+esc(p.code)):'')+'</div>'
           + '<div class="sub">'+reward+' · '+p.granted+' activated / '+p.signups+' signups · '+p.clicks+' clicks</div></div>'
-          + '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#8A94A6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+          + '<div class="right"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#8A94A6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>';
       });
       $("partnersList").innerHTML = html;
       $("partnersList").querySelectorAll(".row.click").forEach(function(r){
@@ -509,7 +554,7 @@
         html += '<div class="row"><div class="left">'
           + '<div class="note">User '+esc(r.referred_short)+'</div>'
           + '<div class="sub">'+(r.activation_mode==="instant"?"Instant · ":"")+"Redeemed "+fmtDate(r.redeemed_at)+(r.granted_at?(" · Granted "+fmtDate(r.granted_at)):"")+'</div></div>'
-          + '<span class="status '+r.status+'">'+r.status+'</span></div>';
+          + '<div class="right"><span class="status '+r.status+'">'+r.status+'</span></div></div>';
       });
       $("detailActivity").innerHTML = html;
     }).catch(function(){ $("detailActivity").innerHTML = '<div class="empty">Could not load activity.</div>'; });
