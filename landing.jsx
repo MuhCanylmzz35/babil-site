@@ -109,7 +109,6 @@ function Nav({ page, setPage, variant, setVariant }) {
                     style={{ opacity: a.href ? 1 : 0.5, cursor: a.href ? "pointer" : "default" }}
                   >
                     <span style={{ fontSize: 13, fontWeight: 700, width: 64, flexShrink: 0 }}>{a.label}</span>
-                    <span style={{ fontSize: 12, fontWeight: 500, color: "#8A94A6" }}>{a.desc}</span>
                   </button>
                 ))}
               </div>
@@ -149,7 +148,7 @@ function Nav({ page, setPage, variant, setVariant }) {
             <button key={a.k} className="mobile-menu-link" disabled={!a.href}
               style={{ opacity: a.href ? 1 : 0.5 }}
               onClick={() => { if (a.href) { setMobileOpen(false); window.location.href = a.href; } }}>
-              {a.label}<span style={{ fontSize: 12, color: "#8A94A6", marginLeft: 8 }}>{a.desc}</span>
+              {a.label}
             </button>
           ))}
           <div className="mobile-menu-download">

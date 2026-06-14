@@ -268,10 +268,17 @@
             </div>
 
             <div class="field">
-              <label>Partner reward</label>
-              <div class="checkrow"><input id="partnerEnabled" type="checkbox" checked /><span>Give the partner a free reward for each activation</span></div>
+              <label for="partnerModel">Partner reward</label>
+              <select id="partnerModel">
+                <option value="none">No reward — partner earns nothing</option>
+                <option value="every" selected>On every activation</option>
+                <option value="first">On first activation only</option>
+                <option value="milestone">Milestone rewards</option>
+              </select>
+              <div class="hint" id="partnerModelHint"></div>
             </div>
-            <div class="grid2" id="partnerRewardRow">
+
+            <div class="grid2 hidden" id="partnerBaseRow">
               <div class="field">
                 <label for="partnerRewardType">Partner reward type</label>
                 <select id="partnerRewardType"><option value="">Same as referred</option><option value="premium">Premium</option><option value="unlimited">Unlimited</option></select>
@@ -280,6 +287,19 @@
                 <label for="partnerRewardMonths">Partner months</label>
                 <input id="partnerRewardMonths" type="number" min="1" max="12" placeholder="Same" />
               </div>
+            </div>
+
+            <div class="field hidden" id="partnerCapRow">
+              <label for="partnerRewardMax">Max rewards total (optional)</label>
+              <input id="partnerRewardMax" type="number" min="0" max="100000" placeholder="Unlimited" />
+              <div class="hint">The most rewards this partner can ever earn. Leave empty for unlimited.</div>
+            </div>
+
+            <div class="field hidden" id="partnerTiersWrap">
+              <label>Milestones</label>
+              <div id="partnerTiers" style="display:flex;flex-direction:column;gap:10px"></div>
+              <button type="button" class="inline" id="addTier" style="align-self:flex-start;margin-top:4px">+ Add milestone</button>
+              <div class="hint">The partner earns the reward once their total activations reach each number.</div>
             </div>
 
             <div class="grid2">
@@ -415,16 +435,68 @@
   var inviteForm = $("inviteForm"), inviteBtn = $("inviteBtn"), inviteMsg = $("inviteMsg");
   var resultBox = $("resultBox"), resultUrl = $("resultUrl"), copyBtn = $("copyBtn"), copyMsg = $("copyMsg");
 
-  $("partnerEnabled").addEventListener("change", function(){ $("partnerRewardRow").style.opacity = this.checked ? "1" : "0.4"; });
+  // ---- Partner reward model UI ----
+  var PARTNER_HINTS = {
+    none: "The partner earns nothing. Only the referred user is rewarded.",
+    every: "Each time a referred user activates their reward, the partner earns this reward too. Repeats for every activation.",
+    first: "The partner earns this reward once, on their first successful activation. Later activations earn nothing.",
+    milestone: "The partner earns a reward only when their total activations reach a number you set below."
+  };
+  function tierRowHtml(){
+    return '<div class="tier-row" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">'
+      + '<span class="hint" style="color:var(--text2)">After</span>'
+      + '<input type="number" class="tier-count" min="1" max="100000" placeholder="5" style="width:90px" />'
+      + '<span class="hint" style="color:var(--text2)">activations:</span>'
+      + '<select class="tier-type" style="width:130px"><option value="premium">Premium</option><option value="unlimited">Unlimited</option></select>'
+      + '<input type="number" class="tier-months" min="1" max="12" value="1" style="width:80px" />'
+      + '<span class="hint" style="color:var(--text2)">mo</span>'
+      + '<button type="button" class="link tier-remove" style="margin-left:auto">Remove</button>'
+      + '</div>';
+  }
+  function addTier(){
+    var div = document.createElement("div");
+    div.innerHTML = tierRowHtml();
+    var row = div.firstChild;
+    row.querySelector(".tier-remove").addEventListener("click", function(){ row.remove(); });
+    $("partnerTiers").appendChild(row);
+  }
+  $("addTier").addEventListener("click", addTier);
+  function syncPartnerModel(){
+    var m = $("partnerModel").value;
+    $("partnerModelHint").textContent = PARTNER_HINTS[m] || "";
+    $("partnerBaseRow").classList.toggle("hidden", !(m === "every" || m === "first"));
+    $("partnerCapRow").classList.toggle("hidden", !(m === "every" || m === "milestone"));
+    $("partnerTiersWrap").classList.toggle("hidden", m !== "milestone");
+    if(m === "milestone" && !$("partnerTiers").children.length){ addTier(); }
+  }
+  $("partnerModel").addEventListener("change", syncPartnerModel);
+  syncPartnerModel();
 
   inviteForm.addEventListener("submit", function(e){
     e.preventDefault();
     inviteMsg.textContent=""; inviteMsg.className="msg"; resultBox.classList.add("hidden");
     inviteBtn.disabled = true; inviteBtn.innerHTML = '<span class="spin"></span>Creating…';
 
-    var partnerEnabled = $("partnerEnabled").checked;
-    var prType = $("partnerRewardType").value || null;
-    var prMonths = $("partnerRewardMonths").value ? Number($("partnerRewardMonths").value) : null;
+    var model = $("partnerModel").value;
+    var usesBase = model === "every" || model === "first";
+    var prType = usesBase ? ($("partnerRewardType").value || null) : null;
+    var prMonths = usesBase && $("partnerRewardMonths").value ? Number($("partnerRewardMonths").value) : null;
+    var prMax = (model === "every" || model === "milestone") && $("partnerRewardMax").value !== ""
+      ? Number($("partnerRewardMax").value) : null;
+    var prTiers = null;
+    if(model === "milestone"){
+      prTiers = [];
+      $("partnerTiers").querySelectorAll(".tier-row").forEach(function(r){
+        var count = Number(r.querySelector(".tier-count").value);
+        if(count > 0){
+          prTiers.push({
+            count: count,
+            type: r.querySelector(".tier-type").value,
+            months: Number(r.querySelector(".tier-months").value) || 1
+          });
+        }
+      });
+    }
 
     var body = {
       note: ($("note").value||"").trim(),
@@ -432,9 +504,12 @@
       reward_type: $("rewardType").value,
       reward_duration_months: Number($("rewardMonths").value) || 1,
       activation_mode: $("activationMode").value,
-      partner_reward_enabled: partnerEnabled,
-      partner_reward_type: partnerEnabled ? prType : null,
-      partner_reward_duration_months: partnerEnabled ? prMonths : null,
+      partner_reward_model: model,
+      partner_reward_enabled: model !== "none",
+      partner_reward_type: prType,
+      partner_reward_duration_months: prMonths,
+      partner_reward_max: prMax,
+      partner_reward_tiers: prTiers,
       code_valid_months: Number($("codeValidMonths").value) || 18,
       monthly_cap: $("monthlyCap").value === "" ? 50 : Number($("monthlyCap").value)
     };
