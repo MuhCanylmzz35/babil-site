@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Work Summary — Babil</title>
-<meta name="description" content="See this work summary — hours, earnings, and more — on Babil." />
-<meta property="og:title" content="Work Summary on Babil" />
-<meta property="og:description" content="Hours worked, earnings, and job breakdown — see the full recap on Babil." />
+<title>Report — Babil</title>
+<meta name="description" content="See this Babil report — work hours, earnings, spending, and savings." />
+<meta property="og:title" content="A report on Babil" />
+<meta property="og:description" content="Work hours, earnings, spending and savings — see the full breakdown on Babil." />
 <meta property="og:type" content="website" />
 <meta property="og:image" content="https://babilfinance.com/assets/icon.png" />
 <meta name="theme-color" content="#0D1117" />
@@ -26,24 +26,45 @@
   .brandname{background:linear-gradient(135deg,#FFB547,#FF6B35);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
   .logo{width:26px;height:26px}
   .badge{background:rgba(108,99,255,.13);border:1px solid rgba(108,99,255,.35);color:var(--primary-muted);
-    font-size:10px;font-weight:800;letter-spacing:1px;padding:5px 10px;border-radius:8px}
+    font-size:10px;font-weight:800;letter-spacing:1px;padding:5px 10px;border-radius:8px;display:inline-block;margin-bottom:12px}
   .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px;margin-bottom:16px}
   h1{font-size:24px;font-weight:800;margin-bottom:2px}
   .period{color:var(--text2);font-size:13px;font-weight:600;margin-bottom:20px}
-  .hero{display:flex;gap:14px;margin-bottom:14px}
-  .hero .col{flex:1}
-  .big{font-size:30px;font-weight:800;line-height:1.05}
   .lbl{color:var(--text2);font-size:11px;font-weight:700;letter-spacing:.5px;margin-top:4px}
-  .sec{display:flex;gap:14px;margin-top:4px}
-  .sec .col{flex:1}
-  .mid{font-size:17px;font-weight:700}
-  .jobs{margin-top:18px;border-top:1px solid var(--border);padding-top:16px}
-  .seclbl{color:var(--text2);font-size:10px;font-weight:800;letter-spacing:.5px;margin-bottom:10px}
+
+  /* Hero stats row — no background */
+  .hero-row{display:flex;align-items:flex-end;gap:0;margin-bottom:20px;flex-wrap:wrap}
+  .hero-income{margin-right:20px}
+  .hero-income .val{font-size:36px;font-weight:800;color:var(--green);line-height:1.05}
+  .hero-spent{margin-right:20px}
+  .hero-spent .val{font-size:22px;font-weight:700;color:var(--red)}
+  .hero-arrow{color:var(--dim);font-size:12px;margin-right:10px;padding-bottom:16px}
+  .hero-net .val{font-size:16px;font-weight:700}
+
+  /* Secondary stats row */
+  .sec-row{display:flex;gap:28px;margin-bottom:0}
+  .sec-row .item .val{font-size:20px;font-weight:800}
+
+  /* Remaining tile grid */
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+  .tile{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px}
+  .tile .val{font-size:22px;font-weight:800}
+  .tile .lbl{margin-top:4px}
+
+  /* Tabs */
+  .tabs{display:flex;background:var(--card);border-radius:12px;padding:4px;margin-top:24px;margin-bottom:20px}
+  .tabs button{flex:1;padding:8px;border:none;border-radius:9px;background:transparent;color:var(--text2);
+    font-size:13px;font-weight:700;cursor:pointer;transition:background .15s,color .15s}
+  .tabs button.active{background:var(--primary);color:#fff}
+
+  /* Section lists */
+  .seclbl{color:var(--text2);font-size:11px;font-weight:800;letter-spacing:.5px;margin-bottom:12px}
+  .section{margin-bottom:24px}
   .job{display:flex;align-items:center;margin-bottom:12px}
   .dot{width:8px;height:8px;border-radius:4px;margin-right:10px;flex:none}
   .job .nm{flex:1;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .job .hr{color:var(--text2);font-size:13px;margin-right:12px}
-  .job .er{color:var(--green);font-size:14px;font-weight:700}
+  .job .er{font-size:14px;font-weight:700}
   .jobrow{display:flex;align-items:center;margin-bottom:12px}
   .jobrow .nm{flex:1;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .jobrow .hr{color:var(--text2);font-size:13px;margin-right:12px}
@@ -56,8 +77,12 @@
   .dayrow .dd{flex:1;color:var(--text2);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .dayrow .dh{width:56px;text-align:right;margin-right:12px;color:var(--text);font-size:13px}
   .dayrow .de{color:var(--green);font-size:13px;font-weight:600}
-  .net{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:14px;margin-top:6px}
-  .net .l{color:var(--text2);font-size:13px;font-weight:700;letter-spacing:.5px}
+  .total-row{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:10px;margin-top:2px;font-size:13px;font-weight:800}
+  .total-lbl{color:var(--text2);font-weight:700}
+  .bar{height:6px;border-radius:3px;background:var(--border);overflow:hidden}
+  .bar>i{display:block;height:6px;border-radius:3px}
+  .showmore{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;background:none;border:none;
+    color:var(--primary);font-size:13px;font-weight:700;cursor:pointer;padding:8px;margin-bottom:6px}
   .cta{display:block;width:100%;background:var(--primary);color:#fff;text-align:center;text-decoration:none;
     font-size:16px;font-weight:700;padding:16px;border-radius:14px;margin-top:6px}
   .ghost{display:block;width:100%;text-align:center;text-decoration:none;color:var(--primary-muted);
@@ -84,11 +109,10 @@
       </svg>
       <span class="brandname">Babil</span>
     </div>
-    <span class="badge">WORK SUMMARY</span>
+    <span class="badge" id="badgeEl">REPORT</span>
   </div>
 
   <div id="loading"><div class="spinner"></div></div>
-
   <div id="content" class="hidden"></div>
 
   <div id="notfound" class="hidden">
@@ -101,7 +125,7 @@
   <a id="openBtn" class="cta hidden" href="#">Open in Babil app</a>
   <a id="getBtn" class="ghost hidden" href="https://babilfinance.com">Don't have Babil? Get the app</a>
 
-  <p class="foot">Babil helps you track your work, earnings, and spending.<br/>Share your own recap with friends.</p>
+  <p class="foot">Babil helps you track your work, earnings, and spending.</p>
 </div>
 
 <script>
@@ -109,7 +133,6 @@
   var SUPABASE_URL = "https://nucsizdduvpojjtvayvn.supabase.co";
   var ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im51Y3NpemRkdXZwb2pqdHZheXZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MTM4MDksImV4cCI6MjA5NDI4OTgwOX0.CSQLhokxnSC6E3BuXbeVil6kjg39QkI9ABF0fNgqQgg";
 
-  // App Store links — update once the app is published.
   var STORE_HOME = "https://babilfinance.com";
 
   var CUR = {USD:"$",EUR:"€",GBP:"£",TRY:"₺",JPY:"¥",CAD:"$",AUD:"$",CHF:"CHF",CNY:"¥",INR:"₹",
@@ -125,8 +148,8 @@
   var WEEKDAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   function fmtHrs(h){return h>0 ? (h%1===0?h:h.toFixed(1))+'h' : '—';}
   function fmtDay(ds){var p=String(ds||'').split('-');if(p.length!==3)return ds||'';var mo=parseInt(p[1],10)-1,d=parseInt(p[2],10),wd=WEEKDAYS[new Date(parseInt(p[0],10),mo,d).getDay()];return wd+', '+MONTHS[mo]+' '+d;}
+  function stripReport(s){return (s||'').replace(/\s*report\s*/gi,'').trim();}
 
-  // Extract the summary id from /work-summary/<id> (or ?id=).
   var parts = location.pathname.split('/').filter(Boolean);
   var last = parts.length ? parts[parts.length-1] : '';
   var id = (last && last.indexOf('work-summary') === -1) ? last : (new URLSearchParams(location.search).get('id') || '');
@@ -138,6 +161,7 @@
   var $notfound = document.getElementById('notfound');
   var $openBtn = document.getElementById('openBtn');
   var $getBtn = document.getElementById('getBtn');
+  var $badge = document.getElementById('badgeEl');
 
   function showOpenButtons(){
     $openBtn.href = deepLink;
@@ -164,76 +188,232 @@
 
   function render(d){
     var s = d.stats || {};
-    var sym = CUR[s.currency] || '$';
+    var w = d.wallet || {};
+    var sym = CUR[w.currency || s.currency] || '$';
     var totalEarned = (s.totalEarnings||0) + (s.extraTotal||0);
-    var net = totalEarned - (s.totalSpent||0);
-    var jobs = (s.jobs||[]).slice(0,4);
-    var hrs = s.totalHours>0 ? (s.totalHours % 1 === 0 ? s.totalHours : s.totalHours.toFixed(1)) + 'h' : '0h';
+    var spentBase = w.totalSpent!=null ? w.totalSpent : (s.totalSpent||0);
+    var net = w.netSavings!=null ? w.netSavings : (totalEarned - (s.totalSpent||0));
 
+    var selectedStats = d.selectedStats || null;
+    function sel(key){
+      if(selectedStats) return selectedStats.indexOf(key)!==-1;
+      if(key==='totalSpent'||key==='topSpendCategories'||key==='netSavings') return !!d.showExpenses;
+      return ['totalHours','totalEarnings','hourlyRate','jobsBreakdown','extraEarnings'].indexOf(key)!==-1;
+    }
+
+    var badge = d.reportType==='wallet' ? 'WALLET REPORT' : d.reportType==='combined' ? 'REPORT' : 'WORK REPORT';
+    $badge.textContent = badge;
+
+    var rawTitle = d.name || (d.createdByName ? d.createdByName + "'s recap" : 'Recap');
+    var titleText = esc(stripReport(rawTitle)) || esc(d.periodLabel || 'Recap');
+
+    // ── Hero stats ──────────────────────────────────────────────────────────
+    var heroIncome = sel('totalIncome')
+      ? {label:'INCOME', val:fmtInt(sym,w.totalIncome), color:'var(--green)'}
+      : sel('totalEarnings')
+      ? {label:'EARNED', val:fmtInt(sym,totalEarned), color:'var(--green)'}
+      : null;
+    var heroSpent = sel('totalSpent') ? fmtInt(sym,spentBase) : null;
+    var heroNet   = sel('netSavings') ? {val:fmtInt(sym,Math.abs(net)), neg:net<0} : null;
+    var heroHours = sel('totalHours') && s.totalHours>0 ? (s.totalHours%1===0?s.totalHours:s.totalHours.toFixed(1))+'h' : null;
+    var heroRate  = sel('hourlyRate') ? (s.hourlyRate!=null ? fmtInt(sym,s.hourlyRate)+'/h' : null) : null;
+    var heroDays  = sel('daysWorked') ? String(s.daysWorked||0) : null;
+
+    // ── Remaining tiles (hero stats excluded) ───────────────────────────────
+    var tiles = [];
+    if(sel('avgHoursPerDay')) tiles.push(['AVG HOURS/DAY','var(--text)', fmtHrs(s.avgHoursPerDay)]);
+    if(sel('dailyAvgSpend')) tiles.push(['DAILY AVG SPEND','var(--red)', fmtInt(sym,w.dailyAvgSpend)]);
+    if(sel('txnCount')) tiles.push(['TRANSACTIONS','var(--text)', String(w.txnCount||0)]);
+    if(sel('biggestExpense')&&w.biggestExpense) tiles.push(['BIGGEST EXPENSE','var(--red)', fmtInt(sym,w.biggestExpense.amount)]);
+    if(sel('biggestIncome')&&w.biggestIncome) tiles.push(['BIGGEST INCOME','var(--green)', fmtInt(sym,w.biggestIncome.amount)]);
+    if(sel('walletTotalBalance')&&w.walletTotalBalance!=null) tiles.push(['WALLET BALANCE','var(--text)', fmtInt(sym,w.walletTotalBalance)]);
+    if(!selectedStats && !d.showExpenses) tiles.push(['DAYS','var(--text)', String(d.days||'—')]);
+
+    // ── Build HTML ───────────────────────────────────────────────────────────
     var html = '<div class="card">';
-    html += '<h1>' + (d.createdByName ? esc(d.createdByName) + "'s recap" : 'Work recap') + '</h1>';
-    html += '<div class="period">' + esc(d.periodLabel||'') + (d.days ? '  ·  ' + d.days + (d.days===1?' day':' days') : '') + '</div>';
+    html += '<h1>'+titleText+'</h1>';
+    html += '<div class="period">'+esc(d.periodLabel||'')+(d.days ? '  ·  '+d.days+(d.days===1?' day':' days') : '')+'</div>';
 
-    html += '<div class="hero">';
-    html += '<div class="col"><div class="big">' + hrs + '</div><div class="lbl">HOURS WORKED</div></div>';
-    html += '<div class="col"><div class="big" style="color:var(--green)">' + fmtInt(sym,totalEarned) + '</div><div class="lbl">EARNED</div></div>';
-    html += '</div>';
+    // Hero row: income + spent + arrow + net saved
+    if(heroIncome || heroSpent || heroNet){
+      html += '<div class="hero-row">';
+      if(heroIncome){
+        html += '<div class="hero-income"><div class="val" style="color:'+heroIncome.color+'">'+heroIncome.val+'</div><div class="lbl">'+heroIncome.label+'</div></div>';
+      }
+      if(heroSpent){
+        html += '<div class="hero-spent"><div class="val">'+heroSpent+'</div><div class="lbl">SPENT</div></div>';
+      }
+      if(heroNet){
+        html += '<div class="hero-arrow">→</div>';
+        html += '<div class="hero-net"><div class="val" style="color:'+(heroNet.neg?'var(--red)':'var(--green)')+'">'+heroNet.val+'</div><div class="lbl">NET SAVED</div></div>';
+      }
+      html += '</div>';
+    }
 
-    html += '<div class="sec">';
-    html += '<div class="col"><div class="mid" style="color:var(--amber)">' + (s.hourlyRate!=null ? fmtInt(sym,s.hourlyRate)+'/h' : '—') + '</div><div class="lbl">AVG PER HOUR</div></div>';
-    if(d.showExpenses){ html += '<div class="col"><div class="mid" style="color:var(--red)">' + fmtInt(sym,s.totalSpent) + '</div><div class="lbl">SPENT</div></div>'; }
-    else { html += '<div class="col"><div class="mid">' + (d.days||'—') + '</div><div class="lbl">DAYS</div></div>'; }
-    html += '</div>';
+    // Secondary row: hours + avg per hour + days worked
+    if(heroHours || heroRate || heroDays){
+      html += '<div class="sec-row">';
+      if(heroHours) html += '<div class="item"><div class="val">'+heroHours+'</div><div class="lbl">HOURS WORKED</div></div>';
+      if(heroRate)  html += '<div class="item"><div class="val" style="color:var(--amber)">'+heroRate+'</div><div class="lbl">AVG PER HOUR</div></div>';
+      if(heroDays)  html += '<div class="item"><div class="val">'+heroDays+'</div><div class="lbl">DAYS WORKED</div></div>';
+      html += '</div>';
+    }
 
-    if(jobs.length){
-      html += '<div class="jobs">';
-      jobs.forEach(function(j, idx){
-        var c = stableColor(j.name);
-        var days = j.days || [];
-        var hasDays = days.length > 0;
-        html += '<div class="jobrow' + (hasDays ? ' clickable' : '') + '" data-idx="'+idx+'">'
-          + '<span class="dot" style="background:'+c+'"></span>'
-          + '<span class="nm">'+esc(j.name)+'</span>'
-          + '<span class="hr">'+fmtHrs(j.hours)+'</span>'
-          + '<span class="er">'+fmtInt(sym,j.earnings)+'</span>'
-          + (hasDays ? '<span class="chev" id="ch'+idx+'">▾</span>' : '')
-          + '</div>';
-        if(hasDays){
-          html += '<div class="jobdetail" id="jd'+idx+'">';
-          days.forEach(function(dd){
-            html += '<div class="dayrow"><span class="dd">'+fmtDay(dd.date)+'</span><span class="dh">'+fmtHrs(dd.hours)+'</span><span class="de">'+fmtInt(sym,dd.earnings)+'</span></div>';
+    // Remaining tiles
+    if(tiles.length){
+      html += '<div class="tiles">';
+      tiles.forEach(function(t){
+        html += '<div class="tile"><div class="val" style="color:'+t[1]+'">'+t[2]+'</div><div class="lbl">'+t[0]+'</div></div>';
+      });
+      html += '</div>';
+    }
+
+    // ── Tabs ─────────────────────────────────────────────────────────────────
+    var incomeBySource = w.incomeBySource || [];
+    var spentByCategory = w.spentByCategory || s.spentByCategory || [];
+    var accounts = w.accounts || [];
+    var jobs = s.jobs || [];
+    var extras = s.extraItems || [];
+
+    // Render first LIST_LIMIT rows; hide the rest behind a "Show N more" toggle
+    // (mirrors SharedWorkSummaryScreen's clamp + ShowMore on the detail page).
+    var LIST_LIMIT = 5;
+    function listWithMore(rows, key){
+      if(rows.length <= LIST_LIMIT) return rows.join('');
+      var n = rows.length - LIST_LIMIT;
+      return rows.slice(0,LIST_LIMIT).join('')
+        + '<div class="more hidden" id="more-'+key+'">' + rows.slice(LIST_LIMIT).join('') + '</div>'
+        + '<button class="showmore" data-key="'+key+'" data-n="'+n+'">Show '+n+' more</button>';
+    }
+
+    var hasWallet = incomeBySource.length || (sel('topSpendCategories') && spentByCategory.length) || (sel('accountBalances') && accounts.length);
+    var hasWork = (sel('jobsBreakdown') && jobs.length) || (sel('extraEarnings') && extras.length);
+
+    if(hasWallet || hasWork){
+      html += '<div class="tabs"><button class="tab active" data-tab="wallet">Wallet</button><button class="tab" data-tab="worklog">Work Log</button></div>';
+
+      // Wallet tab
+      html += '<div class="tab-content" id="tab-wallet">';
+      if(incomeBySource.length){
+        var imax = (w.totalIncome>0) ? w.totalIncome : (incomeBySource[0] ? incomeBySource[0].amount : 1);
+        var incomeTotal = w.totalIncome || incomeBySource.reduce(function(a,x){return a+(x.amount||0);},0);
+        html += '<div class="section"><div class="seclbl">INCOME BY SOURCE</div>';
+        var incomeRows = incomeBySource.map(function(src){
+          var c = src.color || stableColor(src.name);
+          var pct = imax>0 ? Math.round(src.amount/imax*100) : 0;
+          return '<div style="margin-bottom:12px"><div class="job" style="margin-bottom:6px"><span class="dot" style="background:'+c+'"></span><span class="nm">'+esc(src.name)+'</span><span class="er" style="color:var(--green)">'+fmtInt(sym,src.amount)+'</span></div><div class="bar"><i style="width:'+pct+'%;background:'+c+'"></i></div></div>';
+        });
+        html += listWithMore(incomeRows, 'income');
+        html += '<div class="total-row"><span class="total-lbl">Total</span><span style="color:var(--green)">'+fmtInt(sym,incomeTotal)+'</span></div>';
+        html += '</div>';
+      }
+      if(sel('topSpendCategories') && spentByCategory.length){
+        var cmax = spentBase>0 ? spentBase : (spentByCategory[0] ? spentByCategory[0].amount : 1);
+        html += '<div class="section"><div class="seclbl">SPENT BY CATEGORY</div>';
+        var spendRows = spentByCategory.map(function(cat){
+          var c = cat.color || stableColor(cat.name);
+          var pct = cmax>0 ? Math.round(cat.amount/cmax*100) : 0;
+          return '<div style="margin-bottom:12px"><div class="job" style="margin-bottom:6px"><span class="dot" style="background:'+c+'"></span><span class="nm">'+esc(cat.name)+'</span><span class="er" style="color:var(--red)">'+fmtInt(sym,cat.amount)+'</span></div><div class="bar"><i style="width:'+pct+'%;background:'+c+'"></i></div></div>';
+        });
+        html += listWithMore(spendRows, 'spend');
+        html += '<div class="total-row"><span class="total-lbl">Total</span><span style="color:var(--red)">'+fmtInt(sym,spentBase)+'</span></div>';
+        html += '</div>';
+      }
+      if(sel('accountBalances') && accounts.length){
+        html += '<div class="section"><div class="seclbl">ACCOUNT BALANCES</div>';
+        var accountRows = accounts.map(function(acc){
+          var bal = acc.balance||0;
+          return '<div class="dayrow" style="padding:8px 0"><span class="dd" style="color:var(--text);font-weight:600">'+esc(acc.name)+'</span><span class="de" style="color:'+(bal>=0?'var(--text)':'var(--red)')+'">'+(bal<0?'-':'')+fmtInt(sym,Math.abs(bal))+'</span></div>';
+        });
+        html += listWithMore(accountRows, 'accounts');
+        html += '</div>';
+      }
+      if(!incomeBySource.length && !(sel('topSpendCategories') && spentByCategory.length) && !(sel('accountBalances') && accounts.length)){
+        html += '<p style="color:var(--text2);font-size:14px;padding:12px 0">No wallet details available.</p>';
+      }
+      html += '</div>';
+
+      // Work Log tab
+      html += '<div class="tab-content hidden" id="tab-worklog">';
+      var hasJobs = sel('jobsBreakdown') && jobs.length;
+      var hasExtras = sel('extraEarnings') && extras.length;
+      if(hasJobs || hasExtras){
+        var jobTotalHours = jobs.reduce(function(a,j){return a+(j.hours||0);},0);
+        var jobTotalEarned = jobs.reduce(function(a,j){return a+(j.earnings||0);},0);
+        var extrasTotalEarned = extras.reduce(function(a,e){return a+(e.amount||0);},0);
+        html += '<div class="section"><div class="seclbl">BY JOB</div>';
+        if(hasJobs){
+          var jobRows = jobs.map(function(j, idx){
+            var c = j.color || stableColor(j.name);
+            var days = j.days || [];
+            var hasDays = days.length > 0;
+            var row = '<div class="jobrow'+(hasDays?' clickable':'')+'" data-idx="'+idx+'">'
+              + '<span class="dot" style="background:'+c+'"></span>'
+              + '<span class="nm">'+esc(j.name)+'</span>'
+              + '<span class="hr">'+fmtHrs(j.hours)+'</span>'
+              + '<span class="er">'+fmtInt(sym,j.earnings)+'</span>'
+              + (hasDays ? '<span class="chev" id="ch'+idx+'">▾</span>' : '')
+              + '</div>';
+            if(hasDays){
+              row += '<div class="jobdetail" id="jd'+idx+'">';
+              days.forEach(function(dd){
+                row += '<div class="dayrow"><span class="dd">'+fmtDay(dd.date)+'</span><span class="dh">'+fmtHrs(dd.hours)+'</span><span class="de">'+fmtInt(sym,dd.earnings)+'</span></div>';
+              });
+              row += '</div>';
+            }
+            return row;
           });
-          html += '</div>';
+          html += listWithMore(jobRows, 'jobs');
         }
-      });
+        if(hasExtras){
+          extras.forEach(function(e){
+            html += '<div class="jobrow">'
+              + '<span class="dot" style="background:#FFB547"></span>'
+              + '<span class="nm">'+esc(e.source)+'</span>'
+              + '<span class="er">'+fmtInt(sym,e.amount)+'</span>'
+              + '</div>';
+          });
+        }
+        html += '<div class="total-row"><span class="total-lbl">Total</span><span style="display:flex;gap:12px"><span style="color:var(--text2)">'+fmtHrs(jobTotalHours)+'</span><span style="color:var(--green)">'+fmtInt(sym,jobTotalEarned+extrasTotalEarned)+'</span></span></div>';
+        html += '</div>';
+      } else {
+        html += '<p style="color:var(--text2);font-size:14px;padding:12px 0">No work log details available.</p>';
+      }
       html += '</div>';
     }
 
-    var extras = (s.extraItems||[]).slice(0,4);
-    if(extras.length){
-      html += '<div class="jobs"><div class="seclbl">TIPS &amp; BONUSES</div>';
-      extras.forEach(function(e){
-        html += '<div class="job"><span class="dot" style="background:#FFB547"></span><span class="nm">'+esc(e.source)+'</span><span class="er">'+fmtInt(sym,e.amount)+'</span></div>';
-      });
-      html += '</div>';
-    }
-
-    if(d.showExpenses){
-      var nc = net>=0 ? 'var(--green)' : 'var(--red)';
-      html += '<div class="net"><span class="l">NET SAVED</span><span style="color:'+nc+';font-size:18px;font-weight:800">'+(net<0?'-':'')+fmtInt(sym,Math.abs(net))+'</span></div>';
-    }
-
-    html += '</div>';
+    html += '</div>'; // end .card
     $content.innerHTML = html;
     $content.classList.remove('hidden');
 
-    // Expand/collapse a job's per-day breakdown on tap.
+    // Tab switching
+    Array.prototype.forEach.call($content.querySelectorAll('.tab'), function(btn){
+      btn.addEventListener('click', function(){
+        Array.prototype.forEach.call($content.querySelectorAll('.tab'), function(b){ b.classList.remove('active'); });
+        Array.prototype.forEach.call($content.querySelectorAll('.tab-content'), function(c){ c.classList.add('hidden'); });
+        btn.classList.add('active');
+        var tc = $content.querySelector('#tab-'+btn.getAttribute('data-tab'));
+        if(tc) tc.classList.remove('hidden');
+      });
+    });
+
+    // Expand/collapse job day breakdown
     Array.prototype.forEach.call($content.querySelectorAll('.jobrow.clickable'), function(row){
       row.addEventListener('click', function(){
         var idx = row.getAttribute('data-idx');
-        var d = document.getElementById('jd'+idx);
+        var jd = document.getElementById('jd'+idx);
         var ch = document.getElementById('ch'+idx);
-        if(d){ var open = d.classList.toggle('open'); if(ch) ch.textContent = open ? '▴' : '▾'; }
+        if(jd){ var open = jd.classList.toggle('open'); if(ch) ch.textContent = open ? '▴' : '▾'; }
+      });
+    });
+
+    // "Show N more" / "Show less" toggles for long breakdown lists
+    Array.prototype.forEach.call($content.querySelectorAll('.showmore'), function(btn){
+      btn.addEventListener('click', function(){
+        var more = document.getElementById('more-'+btn.getAttribute('data-key'));
+        if(!more) return;
+        var nowHidden = more.classList.toggle('hidden');
+        btn.textContent = nowHidden ? ('Show '+btn.getAttribute('data-n')+' more') : 'Show less';
       });
     });
   }
