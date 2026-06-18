@@ -113,6 +113,13 @@
   .status{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
   .status.pending{color:var(--text2)} .status.eligible,.status.claimed{color:var(--warning)}
   .status.granted{color:var(--green)} .status.expired{color:var(--red)}
+  .status.paused{color:var(--warning)} .status.active{color:var(--green)}
+  .detail-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+  .btn-sm{font-size:13px;font-weight:600;border-radius:9px;padding:9px 14px;cursor:pointer;
+    border:1px solid var(--border);background:var(--elev2);color:var(--primary-muted)}
+  .btn-sm:hover{border-color:var(--primary);color:#fff}
+  .btn-sm:disabled{opacity:.4;cursor:default}
+  .btn-sm.danger{color:var(--red)} .btn-sm.danger:hover{border-color:var(--red);background:var(--red);color:#fff}
   .empty{padding:18px;color:var(--dim);font-size:13px;text-align:center}
 
   /* ---------- Stat cells ---------- */
@@ -344,6 +351,11 @@
           <div class="stats" id="detailStats"></div>
           <div class="panel-h" style="padding:0 4px 10px">Recent activity</div>
           <div id="detailActivity" class="list"><div class="empty">Loading…</div></div>
+          <div class="detail-actions">
+            <button id="togglePartner" class="btn-sm" type="button"></button>
+            <button id="removePartner" class="btn-sm danger" type="button">Remove from list</button>
+          </div>
+          <div id="detailMsg" class="msg" role="status" aria-live="polite" style="margin-top:10px"></div>
         </div>
       </section>
     </div>
@@ -596,14 +608,15 @@
       var html = "";
       data.forEach(function(p){
         var reward = p.reward_type ? rewardLabel(p.reward_type, p.reward_duration_months, p.activation_mode) : "No code yet";
-        html += '<div class="row click" data-pid="'+esc(p.partner_id)+'" data-name="'+esc(p.display_name)+'"><div class="left">'
+        var badge = p.status === "paused" ? '<span class="status paused">paused</span>' : '';
+        html += '<div class="row click" data-pid="'+esc(p.partner_id)+'" data-name="'+esc(p.display_name)+'" data-status="'+esc(p.status)+'"><div class="left">'
           + '<div class="note">'+esc(p.display_name)+(p.code?(' · '+esc(p.code)):'')+'</div>'
           + '<div class="sub">'+reward+' · '+p.granted+' activated / '+p.signups+' signups · '+p.clicks+' clicks</div></div>'
-          + '<div class="right"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#8A94A6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>';
+          + '<div class="right">'+badge+'<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#8A94A6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>';
       });
       $("partnersList").innerHTML = html;
       $("partnersList").querySelectorAll(".row.click").forEach(function(r){
-        r.addEventListener("click", function(){ openPartner(r.getAttribute("data-pid"), r.getAttribute("data-name")); });
+        r.addEventListener("click", function(){ openPartner(r.getAttribute("data-pid"), r.getAttribute("data-name"), r.getAttribute("data-status")); });
       });
     }).catch(function(){ $("partnersList").innerHTML = '<div class="empty">Could not load partners.</div>'; });
   }
@@ -612,10 +625,15 @@
     $("partnerDetail").classList.add("hidden"); $("partnersList").classList.remove("hidden");
   });
 
-  function openPartner(pid, name){
+  var currentPartner = { id:null, name:null, status:null };
+
+  function openPartner(pid, name, status){
+    currentPartner = { id:pid, name:name, status:status || "active" };
     $("detailName").textContent = name || "Partner";
     $("partnersList").classList.add("hidden");
     $("partnerDetail").classList.remove("hidden");
+    $("detailMsg").textContent = ""; $("detailMsg").className = "msg";
+    syncPartnerActions();
     $("detailActivity").innerHTML = '<div class="empty">Loading…</div>';
     $("detailStats").innerHTML = "";
     sb.rpc("admin_partner_detail", { p_partner_id: pid }).then(function(res){
@@ -637,6 +655,57 @@
     }).catch(function(){ $("detailActivity").innerHTML = '<div class="empty">Could not load activity.</div>'; });
   }
   function statCell(n, l){ return '<div class="stat"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>'; }
+
+  // ---- Partner actions: pause / re-activate / remove ----
+  function syncPartnerActions(){
+    var paused = currentPartner.status === "paused";
+    $("togglePartner").textContent = paused ? "Re-activate partner" : "Pause partner";
+    $("togglePartner").disabled = false;
+    $("removePartner").disabled = false;
+  }
+
+  function setPartnerStatus(status, btn, busyLabel){
+    $("detailMsg").textContent = ""; $("detailMsg").className = "msg";
+    var prev = btn.textContent;
+    $("togglePartner").disabled = true; $("removePartner").disabled = true;
+    btn.textContent = busyLabel;
+    sb.rpc("admin_set_partner_status", { p_partner_id: currentPartner.id, p_status: status })
+      .then(function(res){
+        if(res.error){
+          syncPartnerActions(); btn.textContent = prev;
+          $("detailMsg").textContent = (res.error.message||"").indexOf("not_admin")!==-1
+            ? "This account is not an admin." : "Could not update. Please try again.";
+          $("detailMsg").classList.add("err"); return;
+        }
+        if(status === "removed"){
+          // Drop back to the list and refresh; the partner is now hidden.
+          $("partnerDetail").classList.add("hidden"); $("partnersList").classList.remove("hidden");
+          loadPartners(); return;
+        }
+        currentPartner.status = status;
+        syncPartnerActions();
+        $("detailMsg").textContent = status === "paused"
+          ? "Partner paused. Their referral code is now disabled."
+          : "Partner re-activated. Their referral code is live again.";
+        $("detailMsg").classList.add("ok");
+        loadPartners();
+      })
+      .catch(function(){
+        syncPartnerActions(); btn.textContent = prev;
+        $("detailMsg").textContent = "Network error. Please try again.";
+        $("detailMsg").classList.add("err");
+      });
+  }
+
+  $("togglePartner").addEventListener("click", function(){
+    var paused = currentPartner.status === "paused";
+    setPartnerStatus(paused ? "active" : "paused", this, paused ? "Re-activating…" : "Pausing…");
+  });
+
+  $("removePartner").addEventListener("click", function(){
+    if(!window.confirm("Remove " + (currentPartner.name || "this partner") + " from the list? Their referral code will be disabled. You can restore them later from the database.")) return;
+    setPartnerStatus("removed", this, "Removing…");
+  });
 })();
 </script>
 </body>
