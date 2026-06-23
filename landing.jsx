@@ -161,22 +161,20 @@ function Nav({ page, setPage, variant, setVariant }) {
 }
 
 function AppStoreBtn({ store }) {
-  const disabledStyle = {
-    opacity: 0.45,
-    filter: "grayscale(1)",
-    cursor: "default",
-    pointerEvents: "none",
+  const STORE_URLS = {
+    apple: "https://apps.apple.com/app/babil-finance/id6776359639",
+    google: "https://play.google.com/store/apps/details?id=com.babilfinance.app",
   };
   if (store === "apple") return (
-    <a className="store-btn" href="#" style={disabledStyle} aria-disabled="true">
+    <a className="store-btn" href={STORE_URLS.apple} target="_blank" rel="noopener noreferrer">
       <svg className="store-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.04c-.02-2.6 2.13-3.85 2.22-3.91-1.21-1.77-3.1-2.01-3.77-2.04-1.6-.16-3.13.94-3.95.94-.81 0-2.07-.92-3.41-.89-1.75.03-3.37 1.02-4.27 2.59-1.83 3.17-.47 7.86 1.31 10.43.87 1.26 1.9 2.67 3.25 2.62 1.3-.05 1.79-.84 3.37-.84 1.58 0 2.02.84 3.4.81 1.4-.02 2.29-1.28 3.15-2.54.99-1.46 1.4-2.88 1.42-2.95-.03-.01-2.71-1.04-2.73-4.12zM14.59 4.4c.72-.87 1.21-2.07 1.08-3.27-1.04.04-2.31.69-3.05 1.56-.67.77-1.26 2-1.1 3.18 1.16.09 2.35-.59 3.07-1.47z"/></svg>
-      <div><small>Download on the</small><strong>App Store</strong><br /><small style={{ fontSize: 10, letterSpacing: "0.06em", textTransform: "uppercase", color: "#8A94A6" }}>Coming Soon</small></div>
+      <div><small>Download on the</small><strong>App Store</strong></div>
     </a>
   );
   return (
-    <a className="store-btn" href="#" style={disabledStyle} aria-disabled="true">
+    <a className="store-btn" href={STORE_URLS.google} target="_blank" rel="noopener noreferrer">
       <svg className="store-icon" viewBox="0 0 24 24"><path fill="#34A853" d="M3.6 1.7c-.4.3-.6.8-.6 1.4v17.8c0 .6.2 1.1.6 1.4l10.8-10.3L3.6 1.7z"/><path fill="#FBBC04" d="M17.4 8.7l-3-1.7-3.6 3.4 3.6 3.4 3-1.7c1.4-.8 1.4-2.6 0-3.4z"/><path fill="#EA4335" d="M14.4 7l-11 6.3 3.6-3.4L14.4 7z" opacity=".95"/><path fill="#4285F4" d="M3.4 22.3l11-6.3-3.6-3.4-7.4 9.7z" opacity=".95"/></svg>
-      <div><small>GET IT ON</small><strong>Google Play</strong><br /><small style={{ fontSize: 10, letterSpacing: "0.06em", textTransform: "uppercase", color: "#8A94A6" }}>Coming Soon</small></div>
+      <div><small>GET IT ON</small><strong>Google Play</strong></div>
     </a>
   );
 }
