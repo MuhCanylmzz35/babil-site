@@ -75,8 +75,12 @@
   select option{background:var(--elev);color:var(--text)}
   .field{display:flex;flex-direction:column;gap:7px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .checkrow{display:flex;align-items:center;gap:10px}
-  .checkrow input{width:18px;height:18px;flex:0 0 auto}
+  input[type="radio"],input[type="checkbox"]{width:16px;height:16px;flex:0 0 auto;
+    background:initial;border:initial;border-radius:initial;padding:initial;
+    appearance:auto;-webkit-appearance:auto;accent-color:var(--primary);cursor:pointer}
+  input[type="radio"]:focus,input[type="checkbox"]:focus{border-color:initial}
+  .checkrow{display:flex;align-items:center;gap:10px;cursor:pointer}
+  .checkrow input{width:16px;height:16px;flex:0 0 auto}
   .checkrow span{font-size:13.5px;color:var(--text)}
   .hint{color:var(--dim);font-size:12px;line-height:1.5}
 
