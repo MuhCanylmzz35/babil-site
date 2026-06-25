@@ -219,6 +219,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         Partners
       </button>
+      <button class="nav-item" data-nav="promo" data-active="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><rect x="2" y="7" width="20" height="5" rx="1"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+        Promo Codes
+      </button>
     </nav>
     <div class="sb-foot">
       <div class="sb-account"><b id="acctEmail">&nbsp;</b> Signed in</div>
@@ -339,6 +343,91 @@
         <div id="invitesList" class="list"><div class="empty">Loading…</div></div>
       </section>
 
+      <!-- ===== Promo Codes ===== -->
+      <section id="view-promo" class="hidden">
+        <div class="panel">
+          <div class="panel-h">New promo code</div>
+          <p class="panel-sub">Create a gift code that instantly grants the recipient a free plan. Use single-use codes for friends or event prizes, multi-use codes for campaigns.</p>
+          <form id="promoForm" novalidate>
+            <div class="field">
+              <label for="promoLabel">Label / note (optional)</label>
+              <input id="promoLabel" type="text" placeholder="e.g. December event 1st prize" maxlength="120" />
+            </div>
+
+            <div class="grid2">
+              <div class="field">
+                <label for="promoPlan">Plan</label>
+                <select id="promoPlan">
+                  <option value="unlimited">Unlimited</option>
+                  <option value="premium">Premium</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="promoDuration">Duration</label>
+                <select id="promoDuration">
+                  <option value="1">1 month</option>
+                  <option value="3">3 months</option>
+                  <option value="6">6 months</option>
+                  <option value="12">1 year</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Usage limit</label>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <label class="checkrow"><input type="radio" name="promoUsage" value="single" checked /> <span>Single use (one person only)</span></label>
+                <label class="checkrow"><input type="radio" name="promoUsage" value="multi" /> <span>Limited uses:</span>
+                  <input id="promoMaxUses" type="number" min="2" max="100000" value="10" style="width:100px;margin-left:8px" disabled />
+                </label>
+                <label class="checkrow"><input type="radio" name="promoUsage" value="unlimited" /> <span>Unlimited uses</span></label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="promoExpires">Expiry date (optional)</label>
+              <input id="promoExpires" type="date" />
+              <div class="hint">Leave empty for no expiry.</div>
+            </div>
+
+            <div class="field">
+              <label>Code</label>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <label class="checkrow"><input type="radio" name="promoCodeMode" value="auto" checked /> <span>Auto-generate (e.g. BABILXK29QR)</span></label>
+                <label class="checkrow"><input type="radio" name="promoCodeMode" value="custom" />
+                  <input id="promoCustomCode" type="text" placeholder="e.g. ARKADAS2025" maxlength="20" style="width:200px;margin-left:8px;text-transform:uppercase" disabled />
+                </label>
+              </div>
+              <div class="hint" style="margin-top:6px">Uppercase letters and numbers only, 3-20 characters.</div>
+            </div>
+
+            <button id="promoBtn" class="btn" type="submit">Create code</button>
+            <div id="promoMsg" class="msg" role="status" aria-live="polite"></div>
+          </form>
+
+          <div id="promoResultBox" class="linkbox hidden">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font-size:22px;font-weight:800;letter-spacing:2px;color:var(--green)" id="promoResultCode"></span>
+              <button id="promoCopyBtn" class="inline" type="button">Copy</button>
+              <span id="promoCopyMsg" class="meta"></span>
+            </div>
+            <div id="promoResultMeta" class="meta"></div>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px">
+          <div class="panel-h" style="padding:0 4px">Codes</div>
+          <div style="display:flex;gap:8px">
+            <button class="inline promo-filter" data-filter="all" style="border-color:var(--primary);color:#fff">All</button>
+            <button class="inline promo-filter" data-filter="active">Active</button>
+            <button class="inline promo-filter" data-filter="exhausted">Exhausted</button>
+            <button class="inline promo-filter" data-filter="expired">Expired</button>
+          </div>
+        </div>
+        <div id="promoList" class="list"><div class="empty">Loading…</div></div>
+      </section>
+
       <!-- ===== Partners ===== -->
       <section id="view-partners" class="hidden">
         <div id="partnersList" class="list"><div class="empty">Loading…</div></div>
@@ -377,6 +466,8 @@
   var authBtn = $("authBtn"), authMsg = $("authMsg");
   var adminBanner = $("adminBanner");
   var partnersLoaded = false;
+  var promoLoaded = false;
+  var promoFilter = "all";
 
   function setAuthMsg(t, kind){ authMsg.textContent=t||""; authMsg.className="msg"+(kind?(" "+kind):""); }
   function showAuth(){ authView.classList.remove("hidden"); appView.classList.add("hidden"); }
@@ -424,8 +515,9 @@
 
   // Sidebar nav
   var NAV = {
-    invites:{ title:"Invites", sub:"Create and track single-use partner invite links." },
-    partners:{ title:"Partners", sub:"Browse partners and their referral performance." }
+    invites: { title:"Invites", sub:"Create and track single-use partner invite links." },
+    partners:{ title:"Partners", sub:"Browse partners and their referral performance." },
+    promo:   { title:"Promo Codes", sub:"Create gift codes that instantly grant free plan access." }
   };
   document.querySelectorAll(".nav-item").forEach(function(b){
     b.addEventListener("click", function(){ navTo(b.getAttribute("data-nav")); });
@@ -438,11 +530,12 @@
     $("pageSub").textContent = NAV[name].sub;
     $("view-invites").classList.toggle("hidden", name !== "invites");
     $("view-partners").classList.toggle("hidden", name !== "partners");
+    $("view-promo").classList.toggle("hidden", name !== "promo");
     if(name === "partners"){
-      // Always return to the list when entering the tab.
       $("partnerDetail").classList.add("hidden"); $("partnersList").classList.remove("hidden");
       if(!partnersLoaded){ partnersLoaded = true; loadPartners(); }
     }
+    if(name === "promo" && !promoLoaded){ promoLoaded = true; loadPromos(); }
   }
 
   // ---- Invite creation ----
@@ -706,6 +799,201 @@
     if(!window.confirm("Remove " + (currentPartner.name || "this partner") + " from the list? Their referral code will be disabled. You can restore them later from the database.")) return;
     setPartnerStatus("removed", this, "Removing…");
   });
+  // ================================================================
+  // ---- Promo Codes ----
+  // ================================================================
+
+  // Usage-limit radio: enable/disable the multi-use number input.
+  document.querySelectorAll("input[name=promoUsage]").forEach(function(r){
+    r.addEventListener("change", function(){
+      $("promoMaxUses").disabled = (r.value !== "multi");
+      if(r.value === "multi") $("promoMaxUses").focus();
+    });
+  });
+
+  // Code-mode radio: enable/disable custom code input.
+  document.querySelectorAll("input[name=promoCodeMode]").forEach(function(r){
+    r.addEventListener("change", function(){
+      $("promoCustomCode").disabled = (r.value !== "custom");
+      if(r.value === "custom") $("promoCustomCode").focus();
+    });
+  });
+
+  // Normalize custom code input to uppercase.
+  $("promoCustomCode").addEventListener("input", function(){
+    var start = this.selectionStart, end = this.selectionEnd;
+    this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g,"");
+    this.setSelectionRange(start, end);
+  });
+
+  function generateCode(){
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    var suffix = "";
+    for(var i=0;i<6;i++) suffix += chars[Math.floor(Math.random()*chars.length)];
+    return "BABIL" + suffix;
+  }
+
+  var promoForm = $("promoForm");
+  var promoBtn = $("promoBtn");
+  var promoMsg = $("promoMsg");
+  var promoResultBox = $("promoResultBox");
+
+  function setPromoMsg(t, kind){ promoMsg.textContent=t||""; promoMsg.className="msg"+(kind?(" "+kind):""); }
+
+  promoForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    setPromoMsg(""); promoResultBox.classList.add("hidden");
+
+    // Resolve code.
+    var codeMode = document.querySelector("input[name=promoCodeMode]:checked").value;
+    var code = codeMode === "custom" ? ($("promoCustomCode").value||"").trim().toUpperCase() : generateCode();
+    if(!code || code.length < 3){ setPromoMsg("Enter a code (3-20 uppercase letters/numbers).","err"); return; }
+
+    // Resolve max_uses.
+    var usageMode = document.querySelector("input[name=promoUsage]:checked").value;
+    var maxUses = null;
+    if(usageMode === "single") maxUses = 1;
+    else if(usageMode === "multi"){
+      maxUses = Number($("promoMaxUses").value);
+      if(!maxUses || maxUses < 2){ setPromoMsg("Enter a valid number of uses (min 2).","err"); return; }
+    }
+    // "unlimited" => maxUses stays null.
+
+    // Resolve expiry.
+    var expiresVal = $("promoExpires").value;
+    var expiresAt = expiresVal ? new Date(expiresVal).toISOString() : null;
+
+    promoBtn.disabled=true; promoBtn.innerHTML='<span class="spin"></span>Creating…';
+
+    sb.rpc("admin_create_promo_code", {
+      p_code: code,
+      p_label: ($("promoLabel").value||"").trim(),
+      p_plan: $("promoPlan").value,
+      p_duration_months: Number($("promoDuration").value),
+      p_max_uses: maxUses,
+      p_expires_at: expiresAt
+    }).then(function(res){
+      promoBtn.disabled=false; promoBtn.textContent="Create code";
+      if(res.error){
+        var m = res.error.message || "";
+        var msg = m.indexOf("not_admin")!==-1 ? "Not an admin."
+          : m.indexOf("invalid_code_format")!==-1 ? "Invalid code format (3-20 uppercase letters/numbers only)."
+          : m.indexOf("reserved_code")!==-1 ? "That code is reserved. Please choose another."
+          : m.indexOf("already exists")!==-1 || m.indexOf("unique")!==-1 ? "That code already exists. Please choose another."
+          : "Could not create code. Please try again.";
+        setPromoMsg(msg,"err"); return;
+      }
+      var row = res.data && res.data[0];
+      var resultCode = (row && row.code) || code;
+      var planLabel = $("promoPlan").value === "unlimited" ? "Unlimited" : "Premium";
+      var dur = Number($("promoDuration").value);
+      var durLabel = dur === 12 ? "1 year" : dur + " month" + (dur>1?"s":"");
+      var usageLabel = maxUses === 1 ? "Single use" : maxUses ? maxUses + " uses" : "Unlimited uses";
+      $("promoResultCode").textContent = resultCode;
+      $("promoResultMeta").textContent = planLabel + " · " + durLabel + " · " + usageLabel;
+      promoResultBox.classList.remove("hidden");
+      // Reset auto-gen so next code is fresh.
+      document.querySelector("input[name=promoCodeMode][value=auto]").checked = true;
+      $("promoCustomCode").disabled = true; $("promoCustomCode").value = "";
+      promoLoaded = false; loadPromos();
+    }).catch(function(){
+      promoBtn.disabled=false; promoBtn.textContent="Create code";
+      setPromoMsg("Network error. Please try again.","err");
+    });
+  });
+
+  $("promoCopyBtn").addEventListener("click", function(){
+    copyText($("promoResultCode").textContent, function(){ $("promoCopyMsg").textContent="Copied"; setTimeout(function(){ $("promoCopyMsg").textContent=""; },1500); });
+  });
+
+  // Filter buttons.
+  document.querySelectorAll(".promo-filter").forEach(function(b){
+    b.addEventListener("click", function(){
+      promoFilter = b.getAttribute("data-filter");
+      document.querySelectorAll(".promo-filter").forEach(function(x){
+        x.style.borderColor = ""; x.style.color = "";
+      });
+      b.style.borderColor = "var(--primary)"; b.style.color = "#fff";
+      renderPromos(window._promoData || []);
+    });
+  });
+
+  window._promoData = [];
+
+  function loadPromos(){
+    $("promoList").innerHTML = '<div class="empty">Loading…</div>';
+    sb.rpc("admin_list_promo_codes").then(function(res){
+      if(res.error){
+        $("promoList").innerHTML = '<div class="empty">Could not load codes.</div>'; return;
+      }
+      window._promoData = res.data || [];
+      renderPromos(window._promoData);
+    }).catch(function(){ $("promoList").innerHTML = '<div class="empty">Could not load codes.</div>'; });
+  }
+
+  function promoStatus(p){
+    if(!p.active) return "inactive";
+    if(p.expires_at && Date.parse(p.expires_at) < Date.now()) return "expired";
+    if(p.max_uses !== null && p.used_count >= p.max_uses) return "exhausted";
+    return "active";
+  }
+
+  function renderPromos(data){
+    var filtered = data.filter(function(p){
+      if(promoFilter === "all") return true;
+      return promoStatus(p) === promoFilter;
+    });
+    if(!filtered.length){ $("promoList").innerHTML = '<div class="empty">No codes match this filter.</div>'; return; }
+    var html = "";
+    filtered.forEach(function(p){
+      var st = promoStatus(p);
+      var planLabel = p.plan === "unlimited" ? "Unlimited" : "Premium";
+      var dur = p.duration_months;
+      var durLabel = dur === 12 ? "1 year" : dur + "mo";
+      var usageLabel = p.max_uses === null ? p.used_count + " used / unlimited" : p.used_count + " / " + p.max_uses + " used";
+      var expiryLabel = p.expires_at ? ("Expires " + fmtDate(p.expires_at)) : "";
+      var sub = [planLabel, durLabel, usageLabel, expiryLabel].filter(Boolean).join(" · ");
+      var stColor = st === "active" ? "active" : st === "exhausted" ? "eligible" : "expired";
+      html += '<div class="row" style="flex-wrap:wrap;gap:10px">'
+        + '<div class="left" style="flex:1;min-width:0">'
+        + '<div class="note" style="font-family:monospace;letter-spacing:1px">'+esc(p.code)+'</div>'
+        + '<div class="sub">'+esc(p.label ? p.label + " · " + sub : sub)+'</div></div>'
+        + '<div class="right" style="flex-wrap:wrap;gap:8px">'
+        + '<button class="inline promo-copy-code" data-code="'+esc(p.code)+'">Copy code</button>'
+        + (st === "active" ? '<button class="btn-sm promo-deactivate" data-id="'+esc(p.id)+'" data-code="'+esc(p.code)+'">Deactivate</button>' : '')
+        + '<button class="btn-sm danger promo-delete" data-id="'+esc(p.id)+'" data-code="'+esc(p.code)+'" data-used="'+p.used_count+'">Delete</button>'
+        + '<span class="status '+stColor+'">'+st+'</span></div></div>';
+    });
+    $("promoList").innerHTML = html;
+
+    $("promoList").querySelectorAll(".promo-copy-code").forEach(function(b){
+      b.addEventListener("click", function(){
+        copyText(b.getAttribute("data-code"), function(){ b.textContent="Copied"; setTimeout(function(){ b.textContent="Copy code"; },1500); });
+      });
+    });
+    $("promoList").querySelectorAll(".promo-deactivate").forEach(function(b){
+      b.addEventListener("click", function(){
+        if(!window.confirm("Deactivate code " + b.getAttribute("data-code") + "? Users can no longer redeem it.")) return;
+        b.disabled=true; b.textContent="Deactivating…";
+        sb.rpc("admin_deactivate_promo_code", { p_code_id: b.getAttribute("data-id") })
+          .then(function(){ promoLoaded=false; loadPromos(); })
+          .catch(function(){ b.disabled=false; b.textContent="Deactivate"; });
+      });
+    });
+    $("promoList").querySelectorAll(".promo-delete").forEach(function(b){
+      b.addEventListener("click", function(){
+        var msg = Number(b.getAttribute("data-used")) > 0
+          ? "This code has been redeemed. It will be deactivated (not deleted) to preserve history. Continue?"
+          : "Delete code " + b.getAttribute("data-code") + "? This cannot be undone.";
+        if(!window.confirm(msg)) return;
+        b.disabled=true; b.textContent="Deleting…";
+        sb.rpc("admin_delete_promo_code", { p_code_id: b.getAttribute("data-id") })
+          .then(function(){ promoLoaded=false; loadPromos(); })
+          .catch(function(){ b.disabled=false; b.textContent="Delete"; });
+      });
+    });
+  }
+
 })();
 </script>
 </body>
