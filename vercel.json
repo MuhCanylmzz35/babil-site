@@ -5,6 +5,12 @@
   "buildCommand": null,
   "installCommand": null,
   "outputDirectory": ".",
+  "headers": [
+    {
+      "source": "/.well-known/apple-app-site-association",
+      "headers": [{ "key": "Content-Type", "value": "application/json" }]
+    }
+  ],
   "rewrites": [
     { "source": "/work-summary/:id", "destination": "/work-summary" },
     { "source": "/join/:code", "destination": "/join" },

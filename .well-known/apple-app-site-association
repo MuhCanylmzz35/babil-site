@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["SB9X384T77.com.babilfinance.app"],
+        "components": [
+          {
+            "/": "/work-summary/*",
+            "comment": "Shared report links open straight in the app instead of bouncing through this site."
+          }
+        ]
+      }
+    ]
+  }
+}
