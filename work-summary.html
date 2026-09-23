@@ -81,6 +81,25 @@
   .total-lbl{color:var(--text2);font-weight:700}
   .bar{height:6px;border-radius:3px;background:var(--border);overflow:hidden}
   .bar>i{display:block;height:6px;border-radius:3px}
+  /* Per-category drill-down (by item / by date), mirrors the app's Stats view */
+  .catwrap{margin-bottom:12px}
+  .catwrap.clickable .job{cursor:pointer}
+  .catdetail{margin-top:10px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:6px 0}
+  .cdmodes{display:flex;background:var(--card);border-radius:8px;padding:3px;margin:0 10px 10px}
+  .cdmode{flex:1;padding:6px 0;border:none;background:none;border-radius:6px;cursor:pointer;
+    color:var(--text2);font-size:12px;font-weight:600;font-family:inherit}
+  .cdmode.active{background:var(--border);color:var(--text)}
+  .cdgroup{padding:8px 10px;border-top:1px solid var(--border)}
+  .cdgroup:first-of-type{border-top:none}
+  .cdhead{display:flex;align-items:center;justify-content:space-between;padding-bottom:8px}
+  .cdhead .cdd{color:#C8D0E0;font-size:12px;font-weight:700}
+  .cdhead .cdt{color:var(--amber);font-size:12px;font-weight:700}
+  .cdrow{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-top:1px solid var(--border)}
+  .cdgroup .cdrow{padding:8px 0}
+  .cdrow:first-child{border-top:none}
+  .cdrow .nm{flex:1;font-size:13px;font-weight:600;padding-right:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cdrow .am{color:var(--red);font-size:13px;font-weight:700}
+  .cdnote{color:var(--text2);font-size:11px;padding:8px 10px 0}
   .showmore{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;background:none;border:none;
     color:var(--primary);font-size:13px;font-weight:700;cursor:pointer;padding:8px;margin-bottom:6px}
   .cta{display:block;width:100%;background:var(--primary);color:#fff;text-align:center;text-decoration:none;
@@ -201,28 +220,37 @@
       return ['totalHours','totalEarnings','hourlyRate','jobsBreakdown','extraEarnings'].indexOf(key)!==-1;
     }
 
-    var badge = d.reportType==='wallet' ? 'WALLET REPORT' : d.reportType==='combined' ? 'REPORT' : 'WORK REPORT';
+    // Trip reports carry a `trip` block: a spend-only recap of one journey.
+    // They render their own hero (total, per day, length) and a day-by-day
+    // timeline instead of the work/wallet layout.
+    var trip = d.trip || null;
+    var isTrip = !!trip;
+    var tripDays = isTrip ? (trip.days || d.days || 0) : 0;
+    var byDay = (trip && trip.byDay) || [];
+
+    var badge = isTrip ? 'TRIP REPORT' : d.reportType==='wallet' ? 'WALLET REPORT' : d.reportType==='combined' ? 'REPORT' : 'WORK REPORT';
     $badge.textContent = badge;
 
-    var rawTitle = d.name || (d.createdByName ? d.createdByName + "'s recap" : 'Recap');
-    var titleText = esc(stripReport(rawTitle)) || esc(d.periodLabel || 'Recap');
+    var rawTitle = d.name || (isTrip ? (trip.name || 'My trip') : (d.createdByName ? d.createdByName + "'s recap" : 'Recap'));
+    var titleText = isTrip ? esc(rawTitle) : (esc(stripReport(rawTitle)) || esc(d.periodLabel || 'Recap'));
+    if(isTrip && trip.logo) titleText = esc(trip.logo) + ' ' + titleText;
 
     // ── Hero stats ──────────────────────────────────────────────────────────
-    var heroIncome = sel('totalIncome')
+    var heroIncome = (!isTrip && sel('totalIncome'))
       ? {label:'INCOME', val:fmtInt(sym,w.totalIncome), color:'var(--green)'}
-      : sel('totalEarnings')
+      : (!isTrip && sel('totalEarnings'))
       ? {label:'EARNED', val:fmtInt(sym,totalEarned), color:'var(--green)'}
       : null;
-    var heroSpent = sel('totalSpent') ? fmtInt(sym,spentBase) : null;
-    var heroNet   = sel('netSavings') ? {val:fmtInt(sym,Math.abs(net)), neg:net<0} : null;
-    var heroHours = sel('totalHours') && s.totalHours>0 ? (s.totalHours%1===0?s.totalHours:s.totalHours.toFixed(1))+'h' : null;
-    var heroRate  = sel('hourlyRate') ? (s.hourlyRate!=null ? fmtInt(sym,s.hourlyRate)+'/h' : null) : null;
-    var heroDays  = sel('daysWorked') ? String(s.daysWorked||0) : null;
+    var heroSpent = (!isTrip && sel('totalSpent')) ? fmtInt(sym,spentBase) : null;
+    var heroNet   = (!isTrip && sel('netSavings')) ? {val:fmtInt(sym,Math.abs(net)), neg:net<0} : null;
+    var heroHours = (!isTrip && sel('totalHours') && s.totalHours>0) ? (s.totalHours%1===0?s.totalHours:s.totalHours.toFixed(1))+'h' : null;
+    var heroRate  = (!isTrip && sel('hourlyRate')) ? (s.hourlyRate!=null ? fmtInt(sym,s.hourlyRate)+'/h' : null) : null;
+    var heroDays  = (!isTrip && sel('daysWorked')) ? String(s.daysWorked||0) : null;
 
     // ── Remaining tiles (hero stats excluded) ───────────────────────────────
     var tiles = [];
     if(sel('avgHoursPerDay')) tiles.push(['AVG HOURS/DAY','var(--text)', fmtHrs(s.avgHoursPerDay)]);
-    if(sel('dailyAvgSpend')) tiles.push(['DAILY AVG SPEND','var(--red)', fmtInt(sym,w.dailyAvgSpend)]);
+    if(sel('dailyAvgSpend') && !isTrip) tiles.push(['DAILY AVG SPEND','var(--red)', fmtInt(sym,w.dailyAvgSpend)]);
     if(sel('txnCount')) tiles.push(['TRANSACTIONS','var(--text)', String(w.txnCount||0)]);
     if(sel('biggestExpense')&&w.biggestExpense) tiles.push(['BIGGEST EXPENSE','var(--red)', fmtInt(sym,w.biggestExpense.amount)]);
     if(sel('biggestIncome')&&w.biggestIncome) tiles.push(['BIGGEST INCOME','var(--green)', fmtInt(sym,w.biggestIncome.amount)]);
@@ -233,6 +261,15 @@
     var html = '<div class="card">';
     html += '<h1>'+titleText+'</h1>';
     html += '<div class="period">'+esc(d.periodLabel||'')+(d.days ? '  ·  '+d.days+(d.days===1?' day':' days') : '')+'</div>';
+
+    // Trip hero: total spent, per day, trip length
+    if(isTrip){
+      html += '<div class="hero-row">';
+      html += '<div class="hero-income"><div class="val" style="color:var(--red)">'+fmtInt(sym,spentBase)+'</div><div class="lbl">SPENT</div></div>';
+      html += '<div class="hero-spent"><div class="val">'+fmtInt(sym,w.dailyAvgSpend)+'</div><div class="lbl">PER DAY</div></div>';
+      html += '<div class="hero-net"><div class="val" style="color:var(--primary-muted)">'+tripDays+'</div><div class="lbl">DAYS</div></div>';
+      html += '</div>';
+    }
 
     // Hero row: income + spent + arrow + net saved
     if(heroIncome || heroSpent || heroNet){
@@ -275,6 +312,52 @@
     var jobs = s.jobs || [];
     var extras = s.extraItems || [];
 
+    // Per-category drill-down, present only when the author opted into the
+    // sensitive `categoryDetails` stat. Older reports have none and their rows
+    // simply stay non-expandable.
+    var categoryDetails = w.categoryDetails || [];
+    function detailFor(name){
+      for(var i=0;i<categoryDetails.length;i++){ if(categoryDetails[i].name===name) return categoryDetails[i]; }
+      return null;
+    }
+
+    // One category bar, optionally wrapping an expandable by-item / by-date panel.
+    // `idx` must be unique across the whole page — it keys the DOM ids.
+    function categoryRow(cat, idx, maxAmount){
+      var c = cat.color || stableColor(cat.name);
+      var pct = maxAmount>0 ? Math.round(cat.amount/maxAmount*100) : 0;
+      var detail = detailFor(cat.name);
+      var out = '<div class="catwrap'+(detail?' clickable':'')+'"'+(detail?' data-cd="'+idx+'"':'')+'>';
+      out += '<div class="job" style="margin-bottom:6px"><span class="dot" style="background:'+c+'"></span>'
+        + '<span class="nm">'+esc(cat.name)+'</span>'
+        + '<span class="er" style="color:var(--red)">'+fmtInt(sym,cat.amount)+'</span>'
+        + (detail ? '<span class="chev" id="cc'+idx+'">▾</span>' : '') + '</div>';
+      out += '<div class="bar"><i style="width:'+pct+'%;background:'+c+'"></i></div>';
+      if(detail){
+        var items = (detail.byItem||[]).map(function(r){
+          return '<div class="cdrow"><span class="nm">'+esc(r.label)+'</span><span class="am">'+fmtInt(sym,r.amount)+'</span></div>';
+        }).join('');
+        var dates = (detail.byDate||[]).map(function(g){
+          var rows = (g.items||[]).map(function(r){
+            return '<div class="cdrow"><span class="nm">'+esc(r.label)+'</span><span class="am">'+fmtInt(sym,r.amount)+'</span></div>';
+          }).join('');
+          return '<div class="cdgroup"><div class="cdhead"><span class="cdd">'+esc(fmtDay(g.date))+'</span>'
+            + '<span class="cdt">'+fmtInt(sym,g.total)+'</span></div>'+rows+'</div>';
+        }).join('');
+        out += '<div class="catdetail hidden" id="cd'+idx+'">'
+          + '<div class="cdmodes">'
+          + '<button class="cdmode active" data-cd="'+idx+'" data-mode="item">By Item</button>'
+          + '<button class="cdmode" data-cd="'+idx+'" data-mode="date">By Date</button>'
+          + '</div>'
+          + '<div id="cdi'+idx+'">'+items+'</div>'
+          + '<div id="cdd'+idx+'" class="hidden">'+dates+'</div>'
+          + (detail.truncated ? '<div class="cdnote">Long list, showing the largest entries only.</div>' : '')
+          + '</div>';
+      }
+      out += '</div>';
+      return out;
+    }
+
     // Render first LIST_LIMIT rows; hide the rest behind a "Show N more" toggle
     // (mirrors SharedWorkSummaryScreen's clamp + ShowMore on the detail page).
     var LIST_LIMIT = 5;
@@ -289,7 +372,28 @@
     var hasWallet = incomeBySource.length || (sel('topSpendCategories') && spentByCategory.length) || (sel('accountBalances') && accounts.length);
     var hasWork = (sel('jobsBreakdown') && jobs.length) || (sel('extraEarnings') && extras.length);
 
-    if(hasWallet || hasWork){
+    if(isTrip){
+      // Trip layout: no tabs. Where the money went, then day by day.
+      if(spentByCategory.length){
+        var tcmax = spentBase>0 ? spentBase : (spentByCategory[0] ? spentByCategory[0].amount : 1);
+        html += '<div class="section"><div class="seclbl">SPENT BY CATEGORY</div>';
+        html += spentByCategory.map(function(cat, ci){ return categoryRow(cat, 't'+ci, tcmax); }).join('');
+        html += '<div class="total-row"><span class="total-lbl">Total</span><span style="color:var(--red)">'+fmtInt(sym,spentBase)+'</span></div>';
+        html += '</div>';
+      }
+      if(byDay.length){
+        var peak = byDay.reduce(function(m,x){return Math.max(m, x.amount||0);}, 0) || 1;
+        html += '<div class="section"><div class="seclbl">SPENT BY DAY</div>';
+        html += byDay.map(function(day){
+          var pct = Math.round((day.amount||0)/peak*100);
+          return '<div style="margin-bottom:12px"><div class="job" style="margin-bottom:6px"><span class="nm">'+esc(fmtDay(day.date))+'</span><span class="er" style="color:var(--red)">'+fmtInt(sym,day.amount)+'</span></div><div class="bar"><i style="width:'+pct+'%;background:var(--red)"></i></div></div>';
+        }).join('');
+        html += '</div>';
+      }
+      if(!spentByCategory.length && !byDay.length){
+        html += '<p style="color:var(--text2);font-size:14px;padding:12px 0">No trip details available.</p>';
+      }
+    } else if(hasWallet || hasWork){
       html += '<div class="tabs"><button class="tab active" data-tab="wallet">Wallet</button><button class="tab" data-tab="worklog">Work Log</button></div>';
 
       // Wallet tab
@@ -310,11 +414,7 @@
       if(sel('topSpendCategories') && spentByCategory.length){
         var cmax = spentBase>0 ? spentBase : (spentByCategory[0] ? spentByCategory[0].amount : 1);
         html += '<div class="section"><div class="seclbl">SPENT BY CATEGORY</div>';
-        var spendRows = spentByCategory.map(function(cat){
-          var c = cat.color || stableColor(cat.name);
-          var pct = cmax>0 ? Math.round(cat.amount/cmax*100) : 0;
-          return '<div style="margin-bottom:12px"><div class="job" style="margin-bottom:6px"><span class="dot" style="background:'+c+'"></span><span class="nm">'+esc(cat.name)+'</span><span class="er" style="color:var(--red)">'+fmtInt(sym,cat.amount)+'</span></div><div class="bar"><i style="width:'+pct+'%;background:'+c+'"></i></div></div>';
-        });
+        var spendRows = spentByCategory.map(function(cat, ci){ return categoryRow(cat, 'w'+ci, cmax); });
         html += listWithMore(spendRows, 'spend');
         html += '<div class="total-row"><span class="total-lbl">Total</span><span style="color:var(--red)">'+fmtInt(sym,spentBase)+'</span></div>';
         html += '</div>';
@@ -404,6 +504,35 @@
         var jd = document.getElementById('jd'+idx);
         var ch = document.getElementById('ch'+idx);
         if(jd){ var open = jd.classList.toggle('open'); if(ch) ch.textContent = open ? '▴' : '▾'; }
+      });
+    });
+
+    // Expand/collapse a category's entry-level detail
+    Array.prototype.forEach.call($content.querySelectorAll('.catwrap.clickable > .job'), function(row){
+      row.addEventListener('click', function(){
+        var idx = row.parentNode.getAttribute('data-cd');
+        var panel = document.getElementById('cd'+idx);
+        var chev = document.getElementById('cc'+idx);
+        if(!panel) return;
+        var nowHidden = panel.classList.toggle('hidden');
+        if(chev) chev.textContent = nowHidden ? '▾' : '▴';
+      });
+    });
+
+    // By Item / By Date switch inside a category's detail panel
+    Array.prototype.forEach.call($content.querySelectorAll('.cdmode'), function(btn){
+      btn.addEventListener('click', function(){
+        var idx = btn.getAttribute('data-cd');
+        var mode = btn.getAttribute('data-mode');
+        var panel = document.getElementById('cd'+idx);
+        if(panel){
+          Array.prototype.forEach.call(panel.querySelectorAll('.cdmode'), function(b){ b.classList.remove('active'); });
+        }
+        btn.classList.add('active');
+        var byItem = document.getElementById('cdi'+idx);
+        var byDate = document.getElementById('cdd'+idx);
+        if(byItem) byItem.classList.toggle('hidden', mode !== 'item');
+        if(byDate) byDate.classList.toggle('hidden', mode !== 'date');
       });
     });
 
